@@ -11,7 +11,9 @@ Answers to exercises in the first four chapters are now available. The answers f
 * [Chapter 1 - Getting Started] (https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/Ch1-GettingStarted/exercises.asc)
 
 * [Chapter 2 - Working With Data] (https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/Ch2-WorkingWithData/exercises.asc)
+
 * [Chapter 3 - Expressions and Conditionals] (https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/Ch3-ExpressionsAndConditionals/exercises.asc)
+
 * [Chapter 4 - Functions] (https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/Ch4-Functions/exercises.asc)
 
 
