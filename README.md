@@ -28,9 +28,9 @@ Here are some of the known errors in the first edition of [Learning Scala] (http
 
 5) Another way to load external Scala code is to paste it into the repl in "raw" mode, where the code is compiled as if it were actually in a proper source file. To do this, type ":paste -raw", hit return, and then paste the contents of your source file from exercise 4. After exiting "paste" mode you should see the greeting.
 
--------------------------------------------------------------------------------
-The "raw" mode here is a mistake. Please use ":paste", not ":paste -raw". 
--------------------------------------------------------------------------------
+
+> The "raw" mode here is a mistake. Please use ":paste", not ":paste -raw". 
+
 
 ### Chapter 3 - Expressions and Conditionals
 
@@ -38,9 +38,7 @@ The "raw" mode here is a mistake. Please use ":paste", not ":paste -raw".
 
 6) Can you rewrite the answer to question 6 to fit on one line? It probably won't be easier to read, but reducing code to its shortest form is an art, and a good exercise to learn the language.
 
--------------------------------------------------------------------------------
-That should be "question 5", not "question 6". Unless you would like a head start on thinking recursively, please assume that the previous question, number 5, is the one to rewrite.
--------------------------------------------------------------------------------
+> That should be "question 5", not "question 6". Unless you would like a head start on thinking recursively, that is.
 
 
 
