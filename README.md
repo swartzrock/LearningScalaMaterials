@@ -1,7 +1,7 @@
 LearningScalaMaterials
 ======================
 
-Supplementary materials for the "Learning Scala" book from O'Reilly Media
+Supplementary materials for [Learning Scala] (http://shop.oreilly.com/product/0636920030287.do), O'Reilly Media, 2014.
 
 
 ## Answers to Exercises 
