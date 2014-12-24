@@ -4,6 +4,12 @@
 Supplementary materials for http://shop.oreilly.com/product/0636920030287.do[Learning Scala], O'Reilly Media, 2014.
 
 
+== Source Listings
+
+
+The https://github.com/swartzrock/LearningScalaMaterials/blob/master/Sources/source_listings.asciidoc[source code for every code block] in the book is available.
+
+
 == Answers to Exercises 
 
 Answers to exercises in the first four chapters are now available. The answers for the exercises in the rest of the chapter will be available by the end of December 2014.
@@ -21,6 +27,7 @@ Answers to exercises in the first four chapters are now available. The answers f
 == Errata
 
 Here are some of the known errors in the first edition of http://shop.oreilly.com/product/0636920030287.do[Learning Scala] . Thank you to all of the readers who have reported them!
+
 
 === Chapter 1 - Getting Started
 

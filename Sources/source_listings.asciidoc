@@ -1,0 +1,4545 @@
+= Source Listings
+
+This document contains all of the source code blocks from http://shop.oreilly.com/product/0636920030287.do[Learning Scala], O'Reilly Media, 2014.
+
+
+
+
+
+== Core Scala
+
+=== 1.Getting Started With The Scalable Language
+
+==== Installing Scala
+
+[source, scala]
+--------------------------------------------------------------------------------
+$ java -version
+java version "1.8.0_05"
+Java(TM) SE Runtime Environment (build 1.8.0_05-b13)
+Java HotSpot(TM) 64-Bit Server VM (build 25.5-b02, mixed mode)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+$ scala
+Welcome to Scala version 2.11.0 (Java HotSpot(TM) 64-Bit Server VM, 
+  Java 1.8.0_05).
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala>
+--------------------------------------------------------------------------------
+
+
+==== Using The Scala REPL
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> println("Hello, World")
+Hello, World
+
+scala>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> 5 * 7
+res0: Int = 35
+
+scala>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> 2 * res0
+res1: Int = 70
+
+scala>
+--------------------------------------------------------------------------------
+
+
+==== Summary
+
+==== Exercises
+
+=== 2. Working With Data: Literals, Values, Variables, and Types
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x: Int = 5
+x: Int = 5
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> x 
+res0: Int = 5
+
+scala> x * 2
+res1: Int = 10
+
+scala> x / 5
+res2: Int = 1
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> res0 * res1
+res3: Int = 50
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> var a: Double = 2.72
+a: Double = 2.72
+
+scala> a = 355.0 / 113.0
+a: Double = 3.1415929203539825
+
+scala> a = 5
+a: Double = 5.0
+--------------------------------------------------------------------------------
+
+
+==== Values
+
+[source, scala]
+--------------------------------------------------------------------------------
+val <identifier>[: <type>] = <data>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x: Int = 20
+x: Int = 20
+
+scala> val greeting: String = "Hello, World"
+greeting: String = Hello, World
+
+scala> val atSymbol: Char = '@'
+atSymbol: Char = @
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x = 20
+x: Int = 20
+
+scala> val greeting = "Hello, World"
+greeting: String = Hello, World
+
+scala> val atSymbol = '@'
+atSymbol: Char = @
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x: Int = "Hello"
+<console>:7: error: type mismatch;
+ found   : String("Hello")
+ required: Int
+       val x: Int = "Hello"
+--------------------------------------------------------------------------------
+
+
+==== Variables
+
+[source, scala]
+--------------------------------------------------------------------------------
+var <identifier>[: <type>] = <data>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> var x = 5
+x: Int = 5
+
+scala> x = x * 4
+x: Int = 20
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> var x = 5
+x: Int = 5
+
+scala> x = "what's up?"
+<console>:8: error: type mismatch;
+ found   : String("what\'s up?")
+ required: Int
+       x = "what's up?"
+           ^
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> var y = 1.5
+y: Double = 1.5
+
+scala> y = 42
+y: Double = 42.0
+--------------------------------------------------------------------------------
+
+
+==== Naming
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val π = 3.14159                                                     <1>
+π: Double = 3.14159
+
+scala> val $ = "USD currency symbol"
+$: String = USD currency symbol
+
+scala> val o_O = "Hmm"
+o_O: String = Hmm
+
+scala> val 50cent = "$0.50"                                                <2>
+<console>:1: error: Invalid literal number
+       val 50cent = "$0.50"
+           ^
+
+scala> val a.b = 25                                                        <3>
+<console>:7: error: not found: value a
+       val a.b = 25
+
+scala> val `a.b` = 4                                                       <4>
+a.b: Int = 4
+--------------------------------------------------------------------------------
+
+
+==== Types
+
+===== Numeric Data Types
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val b: Byte = 10
+b: Byte = 10
+
+scala> val s: Short = b
+s: Short = 10
+
+scala> val d: Double = s
+d: Double = 10.0
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val l: Long = 20
+l: Long = 20
+
+scala> val i: Int = l
+<console>:8: error: type mismatch;
+ found   : Long
+ required: Int
+       val i: Int = l
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val l: Long = 20
+l: Long = 20
+
+scala> val i: Int = l.toInt
+i: Int = 20
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val anInt = 5 
+anInt: Int = 5
+
+scala> val yellowRgb = 0xffff00
+yellowRgb: Int = 16776960
+
+scala> val id = 100l
+id: Long = 100
+
+scala> val pi = 3.1416
+pi: Double = 3.1416
+--------------------------------------------------------------------------------
+
+
+===== Strings
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val hello = "Hello There"
+hello: String = Hello There
+
+scala> val signature = "With Regards, \nYour friend"
+signature: String = 
+With Regards, 
+Your friend
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val greeting = "Hello, " + "World"
+greeting: String = Hello, World
+
+scala> val matched = (greeting == "Hello, World")
+matched: Boolean = true
+
+scala> val theme = "Na " * 16 + "Batman!" // what do you expect this to print?
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val greeting = """She suggested reformatting the file
+     | by replacing tabs (\t) with newlines (\n);
+     | "Why do that?", he asked. """
+greeting: String = 
+She suggested reformatting the file
+by replacing tabs (\t) with newlines (\n);
+"Why do that?", he asked.
+--------------------------------------------------------------------------------
+
+
+====== String Interpolation
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val approx = 355/113f
+approx: Float = 3.141593
+
+scala> println("Pi, using 355/113, is about " + approx + "." )
+Pi, using 355/113, is about 3.141593.
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> println(s"Pi, using 355/113, is about $approx." )
+Pi, using 355/113, is about 3.141593.
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val item = "apple"
+item: String = apple
+
+scala> s"How do you like them ${item}s?"
+res0: String = How do you like them apples?
+
+scala> s"Fish n chips n vinegar, ${"pepper "*3}salt"
+res1: String = Fish n chips n vinegar, pepper pepper pepper salt
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val item = "apple"
+item: String = apple
+
+scala> f"I wrote a new $item%.3s today"
+res2: String = I wrote a new app today
+
+scala> f"Enjoying this $item ${355/113.0}%.5f times today"
+res3: String = Enjoying this apple 3.14159 times today
+--------------------------------------------------------------------------------
+
+
+====== Regular Expressions
+
+[source, scala]
+--------------------------------------------------------------------------------
+val <Regex value>(<identifier>) = <input string>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val input = "Enjoying this apple 3.14159 times today" 
+input: String = Enjoying this apple 3.14159 times today
+
+scala> val pattern = """.* apple ([\d.]+) times .*""".r                     <1>
+pattern: scala.util.matching.Regex = .* apple ([\d.]+) times .*             <2>
+
+scala> val pattern(amountText) = input                                      <3>
+amountText: String = 3.14159
+
+scala> val amount = amountText.toDouble                                     <4>
+amount: Double = 3.14159
+--------------------------------------------------------------------------------
+
+
+===== An Overview Of Scala Types
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val c = 'A'
+c: Char = A
+
+scala> val i: Int = c
+i: Int = 65
+
+scala> val t: Char = 116
+t: Char = t
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val isTrue = !true
+isTrue: Boolean = false
+
+scala> val isFalse = !true
+isFalse: Boolean = false
+
+scala> val unequal = (5 != 6)
+unequal: Boolean = true
+
+scala> val isLess = (5 < 6)
+isLess: Boolean = true
+
+scala> val unequalAndLess = unequal & isLess
+unequalAndLess: Boolean = true
+
+scala> val definitelyFalse = false && unequal
+definitelyFalse: Boolean = false
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val zero = 0
+zero: Int = 0
+
+scala> val isValid = zero > 0
+isValid: Boolean = false
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val nada = ()
+nada: Unit = ()
+--------------------------------------------------------------------------------
+
+
+====== Type Operations
+
+===== Tuples
+
+[source, scala]
+--------------------------------------------------------------------------------
+( <value 1>, <value 2>[, <value 3>...] )
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val info = (5, "Korben", true)
+info: (Int, String, Boolean) = (5,Korben,true)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val name = info._2
+name: String = Korben
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val red = "red" -> "0xff0000"
+red: (String, String) = (red,0xff0000)
+
+scala> val reversed = red._2 -> red._1
+reversed: (String, String) = (0xff0000,red)
+--------------------------------------------------------------------------------
+
+
+==== Summary
+
+==== Exercises
+
+[source, scala]
+--------------------------------------------------------------------------------
+val flag: Boolean = false
+val result: Boolean = (flag == false)
+--------------------------------------------------------------------------------
+
+
+=== 3. Expressions and Conditionals
+
+==== Expressions
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> "hello"
+res0: String = hello
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> "hel" + 'l' + "o"
+res1: String = hello
+--------------------------------------------------------------------------------
+
+
+===== Defining Values And Variables With Expressions
+
+[source, scala]
+--------------------------------------------------------------------------------
+val <identifier>[: <type>] = <expression>
+var <identifier>[: <type>] = <expression>
+--------------------------------------------------------------------------------
+
+
+===== Expression Blocks
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x = 5 * 20; val amount = x + 10
+x: Int = 100
+amount: Int = 110
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val amount = { val x = 5 * 20; x + 10 }
+amount: Int = 110
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val amount = {
+     |   val x = 5 * 20
+     |   x + 10
+     | }
+amount: Int = 110
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> { val a = 1; { val b = a * 2; { val c = b + 4; c } } }
+res5: Int = 6
+--------------------------------------------------------------------------------
+
+
+===== Statements
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x = 1
+x: Int = 1
+--------------------------------------------------------------------------------
+
+
+==== If..Else Expression Blocks 
+
+===== If Expressions
+
+[source, scala]
+--------------------------------------------------------------------------------
+if (<Boolean expression>) <expression>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> if ( 47 % 3 > 0 ) println("Not a multiple of 3")
+Not a multiple of 3
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val result = if ( false ) "what does this return?"
+result: Any = ()
+--------------------------------------------------------------------------------
+
+
+===== If-Else Expressions
+
+[source, scala]
+--------------------------------------------------------------------------------
+if (<Boolean expression>) <expression> 
+else <expression>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x = 10; val y = 20
+x: Int = 10
+y: Int = 20
+
+scala> val max = if (x > y) x else y
+max: Int = 20
+--------------------------------------------------------------------------------
+
+
+==== Match Expressions
+
+[source, scala]
+--------------------------------------------------------------------------------
+<expression> match { 
+  case <pattern match> => <expression>
+  [case...] 
+}
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x = 10; val y = 20
+x: Int = 10
+y: Int = 20
+
+scala> val max = x > y match { 
+     |   case true => x
+     |   case false => y 
+     | }
+max: Int = 20
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val status = 500
+status: Int = 500
+
+scala> val message = status match {
+     |     case 200 => 
+     |         "ok"
+     |     case 400 => {
+     |         println("ERROR - we called the service incorrectly")
+     |         "error"
+     |     }
+     |     case 500 => {
+     |         println("ERROR - the service encountered an error")
+     |         "error"
+     |     }
+     | }
+ERROR - the service encountered an error
+message: String = error
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+case <pattern 1> | <pattern 2> .. => <one or more expressions>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val day = "MON"
+day: String = MON
+
+scala> val kind = day match {
+     |   case "MON" | "TUE" | "WED" | "THU" | "FRI" =>
+     |     "weekday"
+     |   case "SAT" | "SUN" => 
+     |     "weekend"
+     | }   
+kind: String = weekday
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> "match me" match { case "nope" => "sorry" }
+scala.MatchError: match me (of class java.lang.String)
+  ... 32 elided
+--------------------------------------------------------------------------------
+
+
+===== Matching with Wildcard Patterns
+
+[source, scala]
+--------------------------------------------------------------------------------
+case <identifier> => <one or more expressions>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val message = "Ok"
+message: String = Ok
+
+scala> val status = message match {
+     |   case "Ok" => 200
+     |   case other => {
+     |     println(s"Couldn't parse $other")
+     |     -1
+     |   }
+     | }
+status: Int = 200
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+case _ => <one or more expressions>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val message = "Unauthorized"
+message: String = Unauthorized
+
+scala> val status = message match {
+     |   case "Ok" => 200
+     |   case _ => {
+     |     println(s"Couldn't parse $message")
+     |     -1
+     |   }
+     | }
+Couldn't parse Unauthorized
+status: Int = -1
+--------------------------------------------------------------------------------
+
+
+===== Matching with Pattern Guards
+
+[source, scala]
+--------------------------------------------------------------------------------
+case <pattern> if <Boolean expression> => <one or more expressions>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val response: String = null
+response: String = null
+
+scala> response match {
+     |   case s if s != null => println(s"Received '$s'")
+     |   case s => println("Error! Received a null response")
+     | }
+Error! Received a null response
+--------------------------------------------------------------------------------
+
+
+===== Matching Types With Pattern Variables
+
+[source, scala]
+--------------------------------------------------------------------------------
+case <identifier>: <type> => <one or more expressions>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x: Int = 12180
+x: Int = 12180
+
+scala> val y: Any = x
+y: Any = 12180
+
+scala> y match {
+     |   case x: String => s"'x'"
+     |   case x: Double => f"$x%.2f"
+     |   case x: Float => f"$x%.2f"
+     |   case x: Long => s"${x}l"
+     |   case x: Int => s"${x}i"
+     | }
+res9: String = 12180i
+--------------------------------------------------------------------------------
+
+
+==== Loops
+
+[source, scala]
+--------------------------------------------------------------------------------
+<starting integer> [to|until] <ending integer> [by increment]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+for (<identifier> <- <iterator>) [yield] [<expression>]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> for (x <- 1 to 7) { println(s"Day $x:") }
+Day 1: 
+Day 2: 
+Day 3: 
+Day 4: 
+Day 5: 
+Day 6: 
+Day 7:
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> for (x <- 1 to 7) yield { s"Day $x:" }
+res10: scala.collection.immutable.IndexedSeq[String] = Vector(Day 1:, 
+Day 2:, Day 3:, Day 4:, Day 5:, Day 6:, Day 7:)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> for (day <- res0) print(day + ", ")
+Day 1:, Day 2:, Day 3:, Day 4:, Day 5:, Day 6:, Day 7:,
+--------------------------------------------------------------------------------
+
+
+===== Iterator Guards
+
+[source, scala]
+--------------------------------------------------------------------------------
+for (<identifier> <- <iterator> if <Boolean expression>) ...
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val threes = for (i <- 1 to 20 if i % 3 == 0) yield i
+threes: scala.collection.immutable.IndexedSeq[Int] = Vector(3, 6, 9, 12, 15, 18)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val quote = "Faith,Hope,,Charity"
+quote: String = Faith,Hope,,Charity
+
+scala> for { 
+     |   t <- quote.split(",")
+     |   if t != null
+     |   if t.size > 0
+     | }
+     | { println(t) }
+Faith
+Hope
+Charity
+--------------------------------------------------------------------------------
+
+
+===== Nested Iterators
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> for { x <- 1 to 2
+     |       y <- 1 to 3 }
+     | { print(s"($x,$y) ") }
+(1,1) (1,2) (1,3) (2,1) (2,2) (2,3) 
+scala>
+--------------------------------------------------------------------------------
+
+
+===== Value Binding
+
+[source, scala]
+--------------------------------------------------------------------------------
+for (<identifier> <- <iterator>; <identifier> = <expression>) ...
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val powersOf2 = for (i <- 0 to 8; pow = 1 << i) yield pow
+powersOf2: scala.collection.immutable.IndexedSeq[Int] = Vector(1, 2, 4, 8, 
+16, 32, 64, 128, 256)
+--------------------------------------------------------------------------------
+
+
+===== While and Do/While Loops
+
+[source, scala]
+--------------------------------------------------------------------------------
+while (<Boolean expression>) statement
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> var x = 10; while (x > 0) x -= 1
+x: Int = 0
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x = 0
+x: Int = 0
+
+scala> do println(s"Here I am, x = $x") while (x > 0)
+Here I am, x = 0
+--------------------------------------------------------------------------------
+
+
+==== Summary
+
+==== Exercises
+
+[source, scala]
+--------------------------------------------------------------------------------
+$ scala <source file>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+println("Hello, World")
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+$ scala Hello.scala 
+Hello, World
+
+$
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> :load Hello.scala
+Loading Hello.scala...
+Hello, World
+
+scala>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+1, 2, 3, 4, 5,
+6, 7, 8, 9, 10
+....
+--------------------------------------------------------------------------------
+
+
+=== 4. Functions
+
+[source, scala]
+--------------------------------------------------------------------------------
+def <identifier> = <expression>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def hi = "hi"
+hi: String
+
+scala> hi
+res0: String = hi
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+def <identifier>: <type> = <expression>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def hi: String = "hi"
+hi: String
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+def <identifier>(<identifier>: <type>[, ... ]): <type> = <expression>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def multiplier(x: Int, y: Int): Int = { x * y }
+multiplier: (x: Int, y: Int)Int
+
+scala> multiplier(6, 7)
+res0: Int = 42
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def safeTrim(s: String): String = {
+     |   if (s == null) return null
+     |   s.trim()
+     | }
+safeTrim: (s: String)String
+--------------------------------------------------------------------------------
+
+
+==== Procedures
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def log(d: Double) = println(f"Got value $d%.2f") 
+log: (d: Double)Unit
+
+scala> def log(d: Double): Unit = println(f"Got value $d%.2f") 
+log: (d: Double)Unit
+
+scala> log(2.23535)
+Got value 2.24
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def log(d: Double) { println(f"Got value $d%.2f") }
+log: (d: Double)Unit
+--------------------------------------------------------------------------------
+
+
+==== Functions With Empty Parentheses
+
+[source, scala]
+--------------------------------------------------------------------------------
+def <identifier>()[: <type>] = <expression>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def hi(): String = "hi"
+hi: ()String
+
+scala> hi()
+res1: String = hi
+
+scala> hi
+res2: String = hi
+--------------------------------------------------------------------------------
+
+
+==== Function Invocation With Expression Blocks
+
+[source, scala]
+--------------------------------------------------------------------------------
+<function identifier> <expression block>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def formatEuro(amt: Double) = f"€$amt%.2f"
+formatEuro: (amt: Double)String
+
+scala> formatEuro(3.4645)
+res4: String = €3.46
+
+scala> formatEuro { val rate = 1.32; 0.235 + 0.7123 + rate * 5.32 } 
+res5: String = €7.97
+--------------------------------------------------------------------------------
+
+
+==== Recursive Functions
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def power(x: Int, n: Int): Long = {
+     |   if (n >= 1) x * power(x, n-1)
+     |   else 1
+     | }
+power: (x: Int, n: Int)Long
+
+scala> power(2, 8)
+res6: Long = 256
+
+scala> power(2, 1)
+res7: Long = 2
+
+scala> power(2, 0)
+res8: Long = 1
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> @annotation.tailrec
+     | def power(x: Int, n: Int): Long = {
+     |   if (n >= 1) x * power(x, n-1)
+     |   else 1
+     | }
+<console>:9: error: could not optimize @tailrec annotated method power: 
+it contains a recursive call not in tail position
+         if (n >= 1) x * power(x, n-1)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> @annotation.tailrec
+     | def power(x: Int, n: Int): Long = {
+     |   if (n < 1) 1 
+     |   else x * power(x, n-1)
+     | }
+<console>:11: error: could not optimize @tailrec annotated method power: 
+it contains a recursive call not in tail position
+         else x * power(x, n-1)
+                ^
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> @annotation.tailrec
+     | def power(x: Int, n: Int, t: Int = 1): Int = {
+     |   if (n < 1) t
+     |   else power(x, n-1, x*t)
+     | }
+power: (x: Int, n: Int, t: Int)Int
+
+scala> power(2,8)
+res9: Int = 256
+--------------------------------------------------------------------------------
+
+
+==== Nested Functions
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def max(a: Int, b: Int, c: Int) = { 
+     |   def max(x: Int, y: Int) = if (x > y) x else y
+     |   max(a, max(b, c))
+     | }
+max: (a: Int, b: Int, c: Int)Int
+
+scala> max(42, 181, 19)
+res10: Int = 181
+--------------------------------------------------------------------------------
+
+
+==== Calling Functions With Named Parameters
+
+[source, scala]
+--------------------------------------------------------------------------------
+<function name>(<parameter> = <value>)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def greet(prefix: String, name: String) = s"$prefix $name"
+greet: (prefix: String, name: String)String
+
+scala> val greeting1 = greet("Ms", "Brown")
+greeting1: String = Ms Brown
+
+scala> val greeting2 = greet(name = "Brown", prefix = "Mr")
+greeting2: String = Mr Brown
+--------------------------------------------------------------------------------
+
+
+==== Parameters With Default Values
+
+[source, scala]
+--------------------------------------------------------------------------------
+def <identifier>(<identifier>: <type> = <value>): <type>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def greet(prefix: String = "", name: String) = s"$prefix$name"
+greet: (prefix: String, name: String)String
+
+scala> val greeting1 = greet(name = "Paul")
+greeting1: String = Paul
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def greet(name: String, prefix: String = "") = s"$prefix$name"
+greet: (name: String, prefix: String)String
+
+scala> val greeting2 = greet("Ola")
+greeting2: String = Ola
+--------------------------------------------------------------------------------
+
+
+==== VarArg Parameters
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def sum(items: Int*): Int = { 
+     |   var total = 0
+     |   for (i <- items) total += i
+     |   total
+     | }
+sum: (items: Int*)Int
+
+scala> sum(10, 20, 30)
+res11: Int = 60
+
+scala> sum()
+res12: Int = 0
+--------------------------------------------------------------------------------
+
+
+==== Parameter Groups
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def max(x: Int)(y: Int) = if (x > y) x else y
+max: (x: Int)(y: Int)Int
+
+scala> val larger = max(20)(39)
+larger: Int = 39
+--------------------------------------------------------------------------------
+
+
+==== Type Parameters
+
+[source, scala]
+--------------------------------------------------------------------------------
+def <function-name>[type-name](parameter-name>: <type-name>): <type-name>...
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+def identity(s: String): String = s
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+def identity(i: Int): Int = i
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def identity(a: Any): Any = a
+identity: (a: Any)Any
+
+scala> val s: String = identity("Hello")
+<console>:8: error: type mismatch;
+ found   : Any
+ required: String
+       val s: String = identity("Hello")
+                               ^
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def identity[A](a: A): A = a
+identity: [A](a: A)A
+
+scala> val s: String = identity[String]("Hello")
+s: String = Hello
+
+scala> val d: Double = identity[Double](2.717)
+d: Double = 2.717
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val s: String = identity("Hello")
+s: String = Hello
+
+scala> val d: Double = identity(2.717)
+d: Double = 2.717
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val s = identity("Hello")
+s: String = Hello
+
+scala> val d = identity(2.717)
+d: Double = 2.717
+--------------------------------------------------------------------------------
+
+
+==== Methods and Operators
+
+[source, scala]
+--------------------------------------------------------------------------------
+<class instance>.<method>[(<parameters>)]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val s = "vacation.jpg"
+s: String = vacation.jpg
+
+scala> val isJPEG = s.endsWith(".jpg")
+isJPEG: Boolean = true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val d = 65.642
+d: Double = 65.642
+
+scala> d.round
+res13: Long = 66
+
+scala> d.floor
+res14: Double = 65.0
+
+scala> d.compare(18.0)
+res15: Int = 1
+
+scala> d.+(2.721)
+res16: Double = 68.363
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+<object> <method> <parameter>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> d compare 18.0
+res17: Int = 1
+
+scala> d + 2.721
+res18: Double = 68.363
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> 1 + 2 + 3
+res19: Int = 6
+--------------------------------------------------------------------------------
+
+
+==== Writing Readable Functions
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> /**
+     |  * Returns the input string without leading or trailing
+     |  * whitespace, or null if the input string is null.
+     |  * @param s the input string to trim, or null.
+     |  */
+     | def safeTrim(s: String): String = {
+     |   if (s == null) return null
+     |   s.trim()
+     | }
+safeTrim: (s: String)String
+--------------------------------------------------------------------------------
+
+
+==== Summary
+
+==== Exercises
+
+=== 5. First Class Functions
+
+==== Function Types and Values
+
+[source, scala]
+--------------------------------------------------------------------------------
+([<type>, ...]) => <type>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def double(x: Int): Int = x * 2 
+double: (x: Int)Int
+
+scala> double(5) 
+res0: Int = 10
+
+scala> val myDouble: (Int) => Int = double                                <1>
+myDouble: Int => Int = <function1>
+
+scala> myDouble(5)                                                        <2>
+res1: Int = 10
+
+scala> val myDoubleCopy = myDouble
+myDoubleCopy: Int => Int = <function1>
+
+scala> myDoubleCopy(5)                                                    <3>
+res2: Int = 10
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+val <identifier> = <function name> _
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def double(x: Int): Int = x * 2 
+double: (x: Int)Int
+
+scala> val myDouble = double _
+myDouble: Int => Int = <function1>
+
+scala> val amount = myDouble(20)
+amount: Int = 40
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def max(a: Int, b: Int) = if (a > b) a else b
+max: (a: Int, b: Int)Int
+
+scala> val maximize: (Int, Int) => Int = max
+maximize: (Int, Int) => Int = <function2>
+
+scala> maximize(50, 30)
+res3: Int = 50
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50
+logStart: ()String
+
+scala> val start: () => String = logStart
+start: () => String = <function0>
+
+scala> println( start() )
+===================================================
+Starting NOW
+===================================================
+--------------------------------------------------------------------------------
+
+
+==== Higher-Order Functions
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def safeStringOp(s: String, f: String => String) = {
+     |   if (s != null) f(s) else s
+     | }
+safeStringOp: (s: String, f: String => String)String
+
+scala> def reverser(s: String) = s.reverse
+reverser: (s: String)String
+
+scala> safeStringOp(null, reverser)
+res4: String = null
+
+scala> safeStringOp("Ready", reverser)
+res5: String = ydaeR
+--------------------------------------------------------------------------------
+
+
+==== Function Literals
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val doubler = (x: Int) => x * 2
+doubler: Int => Int = <function1>
+
+scala> val doubled = doubler(22)
+doubled: Int = 44
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+([<identifier>: <type>, ... ]) => <expression>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val greeter = (name: String) => s"Hello, $name"
+greeter: String => String = <function1>
+
+scala> val hi = greeter("World")
+hi: String = Hello, World
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def max(a: Int, b: Int) = if (a > b) a else b                        <1>
+max: (a: Int, b: Int)Int
+
+scala> val maximize: (Int, Int) => Int = max                                <2>
+maximize: (Int, Int) => Int = <function2>
+
+scala> val maximize = (a: Int, b: Int) => if (a > b) a else b               <3>
+maximize: (Int, Int) => Int = <function2>
+
+scala> maximize(84, 96)
+res6: Int = 96
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50           
+logStart: ()String
+
+scala> val start = () => "=" * 50 + "\nStarting NOW\n" + "=" * 50          
+start: () => String = <function0>
+
+scala> println( start() )
+===================================================
+Starting NOW
+===================================================
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def safeStringOp(s: String, f: String => String) = {
+     |   if (s != null) f(s) else s
+     | }
+safeStringOp: (s: String, f: String => String)String
+
+scala> safeStringOp(null, (s: String) => s.reverse)
+res7: String = null
+
+scala> safeStringOp("Ready", (s: String) => s.reverse)
+res8: String = ydaeR
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> safeStringOp(null, s => s.reverse)
+res9: String = null
+
+scala> safeStringOp("Ready", s => s.reverse)
+res10: String = ydaeR
+--------------------------------------------------------------------------------
+
+
+==== Placeholder Syntax
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val doubler: Int => Int = _ * 2
+doubler: Int => Int = <function1>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def safeStringOp(s: String, f: String => String) = {
+     |   if (s != null) f(s) else s
+     | }
+safeStringOp: (s: String, f: String => String)String
+
+scala> safeStringOp(null, _.reverse)
+res11: String = null
+
+scala> safeStringOp("Ready", _.reverse)
+res12: String = ydaeR
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def combination(x: Int, y: Int, f: (Int,Int) => Int) = f(x,y)
+combination: (x: Int, y: Int, f: (Int, Int) => Int)Int
+
+scala> combination(23, 12, _ * _)
+res13: Int = 276
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def tripleOp(a: Int, b: Int, c: Int, f: (Int, Int, Int) => Int) = f(a,b,c)
+tripleOp: (a: Int, b: Int, c: Int, f: (Int, Int, Int) => Int)Int
+
+scala> tripleOp(23, 92, 14, _ * _ + _)
+res14: Int = 2130
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def tripleOp[A,B](a: A, b: A, c: A, f: (A, A, A) => B) = f(a,b,c)
+tripleOp: [A, B](a: A, b: A, c: A, f: (A, A, A) => B)B
+
+scala> tripleOp[Int,Int](23, 92, 14, _ * _ + _)
+res15: Int = 2130
+
+scala> tripleOp[Int,Double](23, 92, 14, 1.0 * _ / _ / _)
+res16: Double = 0.017857142857142856
+
+scala> tripleOp[Int,Boolean](93, 92, 14, _ > _ + _)
+res17: Boolean = false
+--------------------------------------------------------------------------------
+
+
+==== Partially-Applied Functions And Currying
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def factorOf(x: Int, y: Int) = y % x == 0
+factorOf: (x: Int, y: Int)Boolean
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val f = factorOf _
+f: (Int, Int) => Boolean = <function2>
+
+scala> val x = f(7, 20)
+x: Boolean = false
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val multipleOf3 = factorOf(3, _: Int)
+multipleOf3: Int => Boolean = <function1>
+
+scala> val y = multipleOf3(78)
+y: Boolean = true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def factorOf(x: Int)(y: Int) = y % x == 0
+factorOf: (x: Int)(y: Int)Boolean
+
+scala> val isEven = factorOf(2) _
+isEven: Int => Boolean = <function1>
+
+scala> val z = isEven(32)
+z: Boolean = true
+--------------------------------------------------------------------------------
+
+
+==== By-Name Parameters
+
+[source, scala]
+--------------------------------------------------------------------------------
+<identifier>: => <type>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def doubles(x: => Int) = {  
+     |   println("Now doubling " + x)                                       <1>
+     |   x * 2
+     | }
+doubles: (x: => Int)Int
+
+scala> doubles(5)                                                           <2>
+Now doubling 5
+res18: Int = 10
+
+scala> def f(i: Int) = { println(s"Hello from f($i)"); i }
+f: (i: Int)Int
+
+scala> doubles( f(8) )                                                      <3>
+Hello from f(8)
+Now doubling 8
+Hello from f(8)                                                             <4>
+res19: Int = 16
+--------------------------------------------------------------------------------
+
+
+==== Partial Functions
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val statusHandler: Int => String = {
+     |   case 200 => "Okay"
+     |   case 400 => "Your Error"
+     |   case 500 => "Our error"
+     | }
+statusHandler: Int => String = <function1>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> statusHandler(200)
+res20: String = Okay
+
+scala> statusHandler(400)
+res21: String = Your Error
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> statusHandler(401)
+scala.MatchError: 401 (of class java.lang.Integer)
+  at $anonfun$1.apply(<console>:7)
+  at $anonfun$1.apply(<console>:7)
+  ... 32 elided
+--------------------------------------------------------------------------------
+
+
+==== Invoking Higher-Order Functions With Function Literal Blocks
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def safeStringOp(s: String, f: String => String) = {
+     |   if (s != null) f(s) else s
+     | }
+safeStringOp: (s: String, f: String => String)String
+
+scala> val uuid = java.util.UUID.randomUUID.toString <1>
+uuid: String = bfe1ddda-92f6-4c7a-8bfc-f946bdac7bc9
+
+scala> val timedUUID = safeStringOp(uuid, { s =>
+     |   val now = System.currentTimeMillis          <2>
+     |   val timed = s.take(24) + now                <3>
+     |   timed.toUpperCase
+     | })
+timedUUID: String = BFE1DDDA-92F6-4C7A-8BFC-1394546043987
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def safeStringOp(s: String)(f: String => String) = {
+     |   if (s != null) f(s) else s
+     | }
+safeStringOp: (s: String)(f: String => String)String
+
+scala> val timedUUID = safeStringOp(uuid) { s =>
+     |   val now = System.currentTimeMillis      
+     |   val timed = s.take(24) + now            
+     |   timed.toUpperCase
+     | }
+timedUUID: String = BFE1DDDA-92F6-4C7A-8BFC-1394546915011
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def timer[A](f: => A): A = {                                         <1>
+     |   def now = System.currentTimeMillis                                 <2>
+     |   val start = now; val a = f; val end = now
+     |   println(s"Executed in ${end - start} ms")
+     |   a
+     | }   
+timer: [A](f: => A)A
+
+scala> val veryRandomAmount = timer {                                       <3>
+     |   util.Random.setSeed(System.currentTimeMillis)
+     |   for (i <- 1 to 100000) util.Random.nextDouble                      <4> 
+     |   util.Random.nextDouble
+     | }
+Executed in 13 ms
+veryRandomAmount: Double = 0.5070558765221892
+--------------------------------------------------------------------------------
+
+
+==== Summary
+
+==== Exercises
+
+[source, scala]
+--------------------------------------------------------------------------------
+def square(m: Double) = m * m
+val sq = square
+--------------------------------------------------------------------------------
+
+
+=== 6. Common Collections
+
+==== Lists, Sets, and Maps
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val numbers = List(32, 95, 24, 21, 17)
+numbers: List[Int] = List(32, 95, 24, 21, 17)
+
+scala> val colors = List("red", "green", "blue")
+colors: List[String] = List(red, green, blue)
+
+scala> println(s"I have ${colors.size} colors: $colors")
+I have 3 colors: List(red, green, blue)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val colors = List("red", "green", "blue")
+colors: List[String] = List(red, green, blue)
+
+scala> colors.head
+res0: String = red
+
+scala> colors.tail
+res1: List[String] = List(green, blue)
+
+scala> colors(1)
+res2: String = green
+
+scala> colors(2)
+res3: String = blue
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val numbers = List(32, 95, 24, 21, 17)
+numbers: List[Int] = List(32, 95, 24, 21, 17)
+
+scala> var total = 0; for (i <- numbers) { total += i }
+total: Int = 189
+
+scala> val colors = List("red", "green", "blue")
+colors: List[String] = List(red, green, blue)
+
+scala> for (c <- colors) { println(c) }
+red
+green
+blue
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val colors = List("red", "green", "blue")
+colors: List[String] = List(red, green, blue)
+
+scala> colors.foreach( (c: String) => println(c) ) <1>
+red
+green
+blue
+
+scala> val sizes = colors.map( (c: String) => c.size ) <2>
+sizes: List[Int] = List(3, 5, 4)
+
+scala> val numbers = List(32, 95, 24, 21, 17)
+numbers: List[Int] = List(32, 95, 24, 21, 17)
+
+scala> val total = numbers.reduce( (a: Int, b: Int) => a + b ) <3>
+total: Int = 189
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val unique = Set(10, 20, 30, 20, 20, 10)
+unique: scala.collection.immutable.Set[Int] = Set(10, 20, 30)
+
+scala> val sum = unique.reduce( (a: Int, b: Int) => a + b )
+sum: Int = 60
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val colorMap = Map("red" -> 0xFF0000, "green" -> 0xFF00, 
+  "blue" -> 0xFF)
+colorMap: scala.collection.immutable.Map[String,Int] = 
+  Map(red -> 16711680, green -> 65280, blue -> 255)
+
+scala> val redRGB = colorMap("red")
+redRGB: Int = 16711680
+
+scala> val cyanRGB = colorMap("green") | colorMap("blue")
+cyanRGB: Int = 65535
+
+scala> val hasWhite = colorMap.contains("white")
+hasWhite: Boolean = false
+
+scala> for (pairs <- colorMap) { println(pairs) }
+(red,16711680)
+(green,65280)
+(blue,255)
+--------------------------------------------------------------------------------
+
+
+==== What's In A List?
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val colors = List("red", "green", "blue")
+colors: List[String] = List(red, green, blue)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val oddsAndEvents = List(List(1, 3, 5), List(2, 4, 6))
+oddsAndEvents: List[List[Int]] = List(List(1, 3, 5), List(2, 4, 6))
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val keyValues = List(('A', 65), ('B',66), ('C',67))
+keyValues: List[(Char, Int)] = List((A,65), (B,66), (C,67))
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val primes = List(2, 3, 5, 7, 11, 13)
+primes: List[Int] = List(2, 3, 5, 7, 11, 13)
+
+scala> val first = primes(0)
+first: Int = 2
+
+scala> val fourth = primes(3)
+fourth: Int = 7
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val first = primes.head
+first: Int = 2
+
+scala> val remaining = primes.tail
+remaining: List[Int] = List(3, 5, 7, 11, 13)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val primes = List(2, 3, 5, 7, 11, 13)
+primes: List[Int] = List(2, 3, 5, 7, 11, 13)
+
+scala> var i = primes
+i: List[Int] = List(2, 3, 5, 7, 11, 13)
+
+scala> while(! i.isEmpty) { print(i.head + ", "); i = i.tail }
+2, 3, 5, 7, 11, 13,
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val primes = List(2, 3, 5, 7, 11, 13)
+primes: List[Int] = List(2, 3, 5, 7, 11, 13)
+
+scala> def visit(i: List[Int]) { if (i.size > 0) { print(i.head + ", "); visit(i.tail) } }
+visit: (i: List[Int])Unit
+
+scala> visit(primes)
+2, 3, 5, 7, 11, 13,
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val primes = List(2, 3, 5, 7, 11, 13)
+primes: List[Int] = List(2, 3, 5, 7, 11, 13)
+
+scala> var i = primes
+i: List[Int] = List(2, 3, 5, 7, 11, 13)
+
+scala> while(i != Nil) { print(i.head + ", "); i = i.tail }
+2, 3, 5, 7, 11, 13,
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val l: List[Int] = List()
+l: List[Int] = List()
+
+scala> l == Nil
+res0: Boolean = true
+
+scala> val m: List[String] = List("a")
+m: List[String] = List(a)
+
+scala> m.head
+res1: String = a
+
+scala> m.tail == Nil
+res2: Boolean = true
+--------------------------------------------------------------------------------
+
+
+===== The Cons Operator
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val numbers = 1 :: 2 :: 3 :: Nil
+numbers: List[Int] = List(1, 2, 3)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val first = Nil.::(1)
+first: List[Int] = List(1)
+
+scala> first.tail == Nil
+res3: Boolean = true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val second = 2 :: first
+second: List[Int] = List(2, 1)
+
+scala> second.tail == first
+res4: Boolean = true
+--------------------------------------------------------------------------------
+
+
+==== List Arithmetic
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val f = List(23, 8, 14, 21) filter (_ > 18)
+f: List[Int] = List(23, 21)
+
+scala> val p = List(1, 2, 3, 4, 5) partition (_ < 3)
+p: (List[Int], List[Int]) = (List(1, 2),List(3, 4, 5))
+
+scala> val s = List("apple", "to") sortBy (_.size)
+s: List[String] = List(to, apple)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val appended = List(1, 2, 3, 4) :+ 5
+appended: List[Int] = List(1, 2, 3, 4, 5)
+
+scala> val suffix = appended takeRight 3
+suffix: List[Int] = List(3, 4, 5)
+
+scala> val middle = suffix dropRight 2
+middle: List[Int] = List(3)
+--------------------------------------------------------------------------------
+
+
+==== Mapping Lists
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> List(0, 1, 0) collect {case 1 => "ok"}
+res0: List[String] = List(ok)
+
+scala> List("milk,tea") flatMap (_.split(','))
+res1: List[String] = List(milk, tea)
+
+scala> List("milk","tea") map (_.toUpperCase)
+res2: List[String] = List(MILK, TEA)
+--------------------------------------------------------------------------------
+
+
+==== Reducing Lists
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val validations = List(true, true, false, true, true, true)
+validations: List[Boolean] = List(true, true, false, true, true, true)
+
+scala> val valid1 = !(validations contains false)
+valid1: Boolean = false
+
+scala> val valid2 = validations forall (_ == true)
+valid2: Boolean = false
+
+scala> val valid3 = validations.exists(_ == false) == false
+valid3: Boolean = false
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def contains(x: Int, l: List[Int]): Boolean = {
+     |   var a: Boolean = false
+     |   for (i <- l) { if (!a) a = (i == x) }
+     |   a
+     | }
+contains: (x: Int, l: List[Int])Boolean
+
+scala> val included = contains(19, List(46, 19, 92))
+included: Boolean = true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def boolReduce(l: List[Int], start: Boolean)(f: (Boolean, Int) => 
+     |   Boolean): Boolean = {
+     | 
+     |   var a = start
+     |   for (i <- l) a = f(a, i)
+     |   a
+     | }
+boolReduce: (l: List[Int], start: Boolean)(f: (Boolean, Int) => Boolean)Boolean
+
+scala> val included = boolReduce(List(46, 19, 92), false) { (a, i) => 
+     |   if (a) a else (i == 19)
+     | }
+included: Boolean = true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def reduceOp[A,B](l: List[A], start: B)(f: (B, A) => B): B = { <1>
+     |   var a = start
+     |   for (i <- l) a = f(a, i)
+     |   a
+     | }
+reduceOp: [A, B](l: List[A], start: B)(f: (B, A) => B)B
+
+scala> val included = reduceOp(List(46, 19, 92), false) { (a, i) => <2>
+     |   if (a) a else (i == 19)
+     | }
+included: Boolean = true
+
+scala> val answer = reduceOp(List(11.3, 23.5, 7.2), 0.0)(_ + _) <3>
+answer: Double = 42.0
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val included = List(46, 19, 92).foldLeft(false) { (a, i) => <1>
+     |   if (a) a else (i == 19)
+     | }
+included: Boolean = true
+
+scala> val answer = List(11.3, 23.5, 7.2).reduceLeft(_ + _)        <2>
+answer: Double = 42.0
+--------------------------------------------------------------------------------
+
+
+==== Converting Collections
+
+===== Java and Scala Collection Compatibility
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import collection.JavaConverters._
+import collection.JavaConverters._
+--------------------------------------------------------------------------------
+
+
+==== Pattern Matching With Collections
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val statuses = List(500, 404)
+statuses: List[Int] = List(500, 404)
+
+scala> val msg = statuses.head match {
+     |   case x if x < 500 => "okay"
+     |   case _ => "whoah, an error"
+     | }
+msg: String = whoah, an error
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val msg = statuses match {
+     |   case x if x contains(500) => "has error"
+     |   case _ => "okay"
+     | }
+msg: String = has error
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val msg = statuses match {
+     |   case List(404, 500) => "not found & error"
+     |   case List(500, 404) => "error & not found"
+     |   case List(200, 200) => "okay"
+     |   case _ => "not sure what happened"
+     | }
+msg: String = error & not found
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val msg = statuses match {
+     |   case List(500, x) => s"Error followed by $x"
+     |   case List(e, x) => s"$e was followed by $x"
+     | }
+msg: String = Error followed by 404
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val head = List('r','g','b') match {
+     |   case x :: xs => x
+     |   case Nil => ' '
+     | }
+head: Char = r
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val code = ('h', 204, true) match {
+     |   case (_, _, false) => 501
+     |   case ('c', _, true) => 302
+     |   case ('h', x, true) => x
+     |   case (c, x, true) => {
+     |     println(s"Did not expect code $c")
+     |     x
+     |   }
+     | }
+code: Int = 204
+--------------------------------------------------------------------------------
+
+
+==== Summary
+
+==== Exercises
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val l: List[String] = io.Source.fromURL(url).getLines.toList
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val url = 
+  "http://api.openweathermap.org/data/2.5/forecast?mode=xml&lat=55&lon=0"
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> println( l(0) )
+<?xml version="1.0" encoding="utf-8"?>
+--------------------------------------------------------------------------------
+
+
+=== 7. More Collections
+
+==== Mutable Collections
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val m = Map("AAPL" -> 597, "MSFT" -> 40) <1>
+m: scala.collection.immutable.Map[String,Int] = 
+  Map(AAPL -> 597, MSFT -> 40)
+
+scala> val n = m - "AAPL" + ("GOOG" -> 521)     <2>
+n: scala.collection.immutable.Map[String,Int] = 
+  Map(MSFT -> 40, GOOG -> 521)
+
+scala> println(m)                               <3>
+Map(AAPL -> 597, MSFT -> 40)
+--------------------------------------------------------------------------------
+
+
+===== Creating New Mutable Collections
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val nums = collection.mutable.Buffer(1)
+nums: scala.collection.mutable.Buffer[Int] = ArrayBuffer(1)
+
+scala> for (i <- 2 to 10) nums += i
+
+scala> println(nums)
+Buffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val nums = collection.mutable.Buffer[Int]()
+nums: scala.collection.mutable.Buffer[Int] = ArrayBuffer()
+
+scala> for (i <- 1 to 10) nums += i
+
+scala> println(nums)
+Buffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> println(nums)
+Buffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+scala> val l = nums.toList
+l: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+--------------------------------------------------------------------------------
+
+
+===== Creating Mutable Collections From Immutable Ones
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val m = Map("AAPL" -> 597, "MSFT" -> 40) 
+m: scala.collection.immutable.Map[String,Int] = 
+  Map(AAPL -> 597, MSFT -> 40)
+
+scala> val b = m.toBuffer                               <1>
+b: scala.collection.mutable.Buffer[(String, Int)] = 
+  ArrayBuffer((AAPL,597), (MSFT,40))
+
+scala> b trimStart 1                                    <2>
+
+scala> b += ("GOOG" -> 521)                             <3>
+res1: b.type = ArrayBuffer((MSFT,40), (GOOG,521))
+
+scala> val n = b.toMap                                  <4>
+n: scala.collection.immutable.Map[String,Int] = 
+  Map(MSFT -> 40, GOOG -> 521)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> b += ("GOOG" -> 521)
+res2: b.type = ArrayBuffer((MSFT,40), (GOOG,521), (GOOG,521))
+
+scala> val l = b.toList
+l: List[(String, Int)] = List((MSFT,40), (GOOG,521), (GOOG,521))
+
+scala> val s = b.toSet
+s: scala.collection.immutable.Set[(String, Int)] = Set((MSFT,40), (GOOG,521))
+--------------------------------------------------------------------------------
+
+
+===== Using Collection Builders
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val b = Set.newBuilder[Char]
+b: scala.collection.mutable.Builder[Char,scala.collection.immutable.
+  Set[Char]] = scala.collection.mutable.SetBuilder@726dcf2c
+
+scala> b += 'h'      <1>
+res3: b.type = scala.collection.mutable.SetBuilder@d13d812
+
+scala> b ++= List('e', 'l', 'l', 'o')   <2>
+res4: b.type = scala.collection.mutable.SetBuilder@d13d812
+
+scala> val helloSet = b.result    <3>
+helloSet: scala.collection.immutable.Set[Char] = Set(h, e, l, o)
+--------------------------------------------------------------------------------
+
+
+==== Arrays
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val colors = Array("red", "green", "blue")
+colors: Array[String] = Array(red, green, blue)
+
+scala> colors(0) = "purple"  <1>
+
+scala> colors <2>
+res0: Array[String] = Array(purple, green, blue)
+
+scala> println("very purple: " + colors) <3>
+very purple: [Ljava.lang.String;@70cf32e3
+
+scala> val files = new java.io.File(".").listFiles <4>
+files: Array[java.io.File] = Array(./Build.scala, ./Dependencies.scala, 
+  ./build.properties, ./JunitXmlSupport.scala, ./Repositories.scala, 
+  ./plugins.sbt, ./project, ./SBTInitialization.scala, ./target)
+
+scala> val scala = files map (_.getName) filter(_ endsWith "scala")
+scala: Array[String] = Array(Build.scala, Dependencies.scala, 
+  JunitXmlSupport.scala, Repositories.scala, SBTInitialization.scala)
+--------------------------------------------------------------------------------
+
+
+==== Seq and Sequences
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val inks = Seq('C','M','Y','K')
+inks: Seq[Char] = List(C, M, Y, K)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val hi = "Hello, " ++ "worldly" take 12 replaceAll ("w","W")
+hi: String = Hello, World
+--------------------------------------------------------------------------------
+
+
+==== Streams
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def inc(i: Int): Stream[Int] = Stream.cons(i, inc(i+1))
+inc: (i: Int)Stream[Int]
+
+scala> val s = inc(1)
+s: Stream[Int] = Stream(1, ?)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val l = s.take(5).toList
+l: List[Int] = List(1, 2, 3, 4, 5)
+
+scala> s
+res1: Stream[Int] = Stream(1, 2, 3, 4, 5, ?)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def inc(head: Int): Stream[Int] = head #:: inc(head+1)
+inc: (head: Int)Stream[Int]
+
+scala> inc(10).take(10).toList
+res0: List[Int] = List(10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def to(head: Char, end: Char): Stream[Char] = (head > end) match {
+     |   case true => Stream.empty
+     |   case false => head #:: to((head+1).toChar, end)
+     | }
+to: (head: Char, end: Char)Stream[Char]
+
+scala> val hexChars = to('A', 'F').take(20).toList
+hexChars: List[Char] = List(A, B, C, D, E, F)
+--------------------------------------------------------------------------------
+
+
+==== Monadic Collections
+
+===== Option Collections
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> var x: String = "Indeed"
+x: String = Indeed
+
+scala> var a = Option(x)
+a: Option[String] = Some(Indeed)
+
+scala> x = null
+x: String = null
+
+scala> var b = Option(x)
+b: Option[String] = None
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> println(s"a is defined? ${a.isDefined}")
+a is defined? true
+
+scala> println(s"b is not defined? ${b.isEmpty}")
+b is not defined? true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def divide(amt: Double, divisor: Double): Option[Double] = { <1>
+     |   if (divisor == 0) None
+     |   else Option(amt / divisor) <2>
+     | }
+divide: (amt: Double, divisor: Double)Option[Double]
+
+scala> val legit = divide(5, 2) 
+legit: Option[Double] = Some(2.5) <3>
+
+scala> val illegit = divide(3, 0)
+illegit: Option[Double] = None <4>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val odds = List(1, 3, 5)
+odds: List[Int] = List(1, 3, 5)
+
+scala> val firstOdd = odds.headOption
+firstOdd: Option[Int] = Some(1)
+
+scala> val evens = odds filter (_ % 2 == 0)
+evens: List[Int] = List()
+
+scala> val firstEven = evens.headOption
+firstEven: Option[Int] = None
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val words = List("risible", "scavenger", "gist")
+words: List[String] = List(risible, scavenger, gist)
+
+scala> val uppercase = words find (w => w == w.toUpperCase)
+uppercase: Option[String] = None
+
+scala> val lowercase = words find (w => w == w.toLowerCase)
+lowercase: Option[String] = Some(risible)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val filtered = lowercase filter (_ endsWith "ible") map (_.toUpperCase)
+filtered: Option[String] = Some(RISIBLE)
+
+scala> val exactSize = filtered filter (_.size > 15) map (_.size)
+exactSize: Option[Int] = None
+--------------------------------------------------------------------------------
+
+
+====== Extracting Values From Options
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def nextOption = if (util.Random.nextInt > 0) Some(1) else None
+nextOption: Option[Int]
+
+scala> val a = nextOption
+a: Option[Int] = Some(1)
+
+scala> val b = nextOption
+b: Option[Int] = None
+--------------------------------------------------------------------------------
+
+
+===== Try Collections
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> throw new Exception("No DB connection, exiting...")
+java.lang.Exception: No DB connection, exiting...
+  ... 32 elided
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def loopAndFail(end: Int, failAt: Int): Int = {
+     |   for (i <- 1 to end) {
+     |     println(s"$i) ")
+     |     if (i == failAt) throw new Exception("Too many iterations")
+     |   }
+     |   end
+     | }
+loopAndFail: (end: Int, failAt: Int)Int
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> loopAndFail(10, 3)
+1) 
+2) 
+3) 
+java.lang.Exception: Too many iterations
+  at $anonfun$loopAndFail$1.apply$mcVI$sp(<console>:10)
+  at $anonfun$loopAndFail$1.apply(<console>:8)
+  at $anonfun$loopAndFail$1.apply(<console>:8)
+  at scala.collection.immutable.Range.foreach(Range.scala:160)
+  at .loopAndFail(<console>:8)
+  ... 32 elided
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val t1 = util.Try( loopAndFail(2, 3) ) <1>
+1) 
+2) 
+t1: scala.util.Try[Int] = Success(2) <2>
+
+scala> val t2 = util.Try{ loopAndFail(4, 2) } <3>
+1) 
+2) 
+t2: scala.util.Try[Int] = Failure(
+  java.lang.Exception: Too many iterations) <4>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def nextError = util.Try{ 1 / util.Random.nextInt(2) }
+nextError: scala.util.Try[Int]
+
+scala> val x = nextError
+x: scala.util.Try[Int] = Failure(java.lang.ArithmeticException: 
+/ by zero)
+
+scala> val y = nextError
+y: scala.util.Try[Int] = Success(1)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val input = " 123 "
+input: String = " 123 "
+
+scala> val result = util.Try(input.toInt) orElse util.Try(input.trim.toInt)
+result: scala.util.Try[Int] = Success(123)
+
+scala> result foreach { r => println(s"Parsed '$input' to $r!") }
+Parsed ' 123 ' to 123!
+
+scala> val x = result match {
+     |   case util.Success(x) => Some(x)
+     |   case util.Failure(ex) => {
+     |     println(s"Couldn't parse input '$input'")
+     |     None
+     |   }
+     | }
+x: Option[Int] = Some(123)
+--------------------------------------------------------------------------------
+
+
+===== Future Collections
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import concurrent.ExecutionContext.Implicits.global
+import concurrent.ExecutionContext.Implicits.global
+
+scala> val f = concurrent.Future { println("hi") }
+hi
+f: scala.concurrent.Future[Unit] = 
+  scala.concurrent.impl.Promise$DefaultPromise@29852487
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val f = concurrent.Future { Thread.sleep(5000); println("hi") }
+f: scala.concurrent.Future[Unit] = 
+  scala.concurrent.impl.Promise$DefaultPromise@4aa3d36
+
+scala> println("waiting")
+waiting
+
+scala> hi
+--------------------------------------------------------------------------------
+
+
+====== Handling Futures Asynchronously
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import concurrent.ExecutionContext.Implicits.global
+import concurrent.ExecutionContext.Implicits.global
+
+scala> import concurrent.Future
+import concurrent.Future
+
+scala> def nextFtr(i: Int = 0) = Future { 
+     |   def rand(x: Int) = util.Random.nextInt(x)
+     | 
+     |   Thread.sleep(rand(5000))
+     |   if (rand(3) > 0) (i + 1) else throw new Exception
+     | }
+nextFtr: (i: Int)scala.concurrent.Future[Int]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import concurrent.Future                                    <1>
+import concurrent.Future
+
+scala> def cityTemp(name: String): Double = {
+     |   val url = "http://api.openweathermap.org/data/2.5/weather" 
+     |   val cityUrl = s"$url?q=$name"
+     |   val json = io.Source.fromURL(cityUrl).mkString.trim       <2>
+     |   val pattern = """.*"temp":([\d.]+).*""".r                 <3>
+     |   val pattern(temp) = json                                  <4>
+     |   temp.toDouble
+     | }
+cityTemp: (name: String)Double
+
+scala> val cityTemps = Future sequence Seq(                        <5>
+     |   Future(cityTemp("Fresno")), Future(cityTemp("Tempe"))
+     | )
+cityTemps: scala.concurrent.Future[Seq[Double]] = 
+ scala.concurrent.impl.Promise$DefaultPromise@51e0301d
+
+scala> cityTemps onSuccess {
+     |   case Seq(x,y) if x > y => println(s"Fresno is warmer: $x K") <6>
+     |   case Seq(x,y) if y > x => println(s"Tempe is warmer: $y K")
+     | }
+Tempe is warmer: 306.1 K
+--------------------------------------------------------------------------------
+
+
+====== Handling Futures Synchronously
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import concurrent.duration._                        <1>
+import concurrent.duration._
+
+scala> val maxTime = Duration(10, SECONDS)                 <2>
+maxTime: scala.concurrent.duration.FiniteDuration = 10 seconds
+
+scala> val amount = concurrent.Await.result(nextFtr(5), maxTime)
+amount: Int = 6                                            <3>
+
+scala> val amount = concurrent.Await.result(nextFtr(5), maxTime)
+java.lang.Exception                                        <4>
+  at $anonfun$nextFtr$1.apply$mcI$sp(<console>:18)
+  at $anonfun$nextFtr$1.apply(<console>:15)
+  at $anonfun$nextFtr$1.apply(<console>:15)
+  ...
+--------------------------------------------------------------------------------
+
+
+==== Summary
+
+==== Exercises
+
+[source, scala]
+--------------------------------------------------------------------------------
+https://github.com/<user name>/<repo name>/commits/<branch name>.atom
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val u = "https://github.com/scala/scala/commits/2.11.x.atom"
+u: String = https://github.com/scala/scala/commits/2.11.x.atom
+
+scala> val s = io.Source.fromURL(u)
+s: scala.io.BufferedSource = non-empty iterator
+
+scala> val text = s.getLines.map(_.trim).mkString("")
+text: String = <?xml version="1.0" encoding="UTF-8"?><feed xmlns=...
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+https://github.com/akka/akka/tree/master
+https://github.com/scala/scala/tree/2.11.x
+https://github.com/sbt/sbt/tree/0.13
+https://github.com/scalaz/scalaz/tree/series/7.2.x
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+#!/usr/bin/env sbt -Dsbt.main.class=sbt.ScriptMain
+
+/***
+scalaVersion := "2.11.1"
+*/
+
+def greet(name: String): String = s"Hello, $name!"
+
+
+// Entry point for our script
+args.toList match {
+  case List(name) => {
+    val greeting = greet(name)
+    println(greeting)
+  }
+  case _ =>
+    println("usage: HelloScript.scala <name>")
+}
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+$ ./HelloScript.scala Jason
+[info] Set current project to root-4926629s8acd7bce0b (in 
+  build file:/Users/jason/.sbt/boot/4926629s8acd7bce0b/)
+Hello, Jason!
+--------------------------------------------------------------------------------
+
+
+== Object-Oriented Scala
+
+=== 8. Classes
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class User
+defined class User
+
+scala> val u = new User
+u: User = User@7a8c8dcf
+
+scala> val isAnyRef = u.isInstanceOf[AnyRef]
+isAnyRef: Boolean = true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class User {
+     |   val name: String = "Yubaba"
+     |   def greet: String = s"Hello from $name"
+     |   override def toString = s"User($name)"
+     | }
+defined class User
+
+scala> val u = new User
+u: User = User(Yubaba)
+
+scala> println( u.greet )
+Hello from Yubaba
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class User(n: String) {
+     |   val name: String = n
+     |   def greet: String = s"Hello from $name"
+     |   override def toString = s"User($name)"
+     | }
+defined class User
+
+scala> val u = new User("Zeniba")
+u: User = User(Zeniba)
+
+scala> println(u.greet)
+Hello from Zeniba
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class User(val name: String) {
+     |   def greet: String = s"Hello from $name"
+     |   override def toString = s"User($name)"
+     | }
+defined class User
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val users = List(new User("Shoto"), new User("Art3mis"), 
+  new User("Aesch"))
+users: List[User] = List(User(Shoto), User(Art3mis), User(Aesch)) <1>
+
+scala> val sizes = users map (_.name.size)                        <2>
+sizes: List[Int] = List(8, 7, 5)
+
+scala> val sorted = users sortBy (_.name)
+sorted: List[User] = List(User(Aesch), User(Art3mis), User(Shoto))
+
+scala> val third = users find (_.name contains "3")               <3>
+third: Option[User] = Some(User(Art3mis))
+
+scala> val greet = third map (_.greet) getOrElse "hi"             <4>
+greet: String = Hello from Art3mis
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class A {
+     |   def hi = "Hello from A"
+     |   override def toString = getClass.getName
+     | }
+defined class A
+
+scala> class B extends A
+defined class B
+
+scala> class C extends B { override def hi = "hi C -> " + super.hi }
+defined class C
+
+scala> val hiA = new A().hi
+hiA: String = Hello from A
+
+scala> val hiB = new B().hi
+hiB: String = Hello from A
+
+scala> val hiC = new C().hi
+hiC: String = hi C -> Hello from A
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val a: A = new A
+a: A = A
+
+scala> val a: A = new B
+a: A = B
+
+scala> val b: B = new A
+<console>:9: error: type mismatch;
+ found   : A
+ required: B
+       val b: B = new A
+                  ^
+
+scala> val b: B = new B
+b: B = B
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val misc = List(new C, new A, new B)
+misc: List[A] = List(C, A, B)
+
+scala> val messages = misc.map(_.hi).distinct.sorted
+messages: List[String] = List(Hello from A, hi C -> Hello from A)
+--------------------------------------------------------------------------------
+
+
+==== Defining Classes
+
+[source, scala]
+--------------------------------------------------------------------------------
+class <identifier> [extends <identifier>] [{ fields, methods, and classes }]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+class <identifier> ([val|var] <identifier>: <type>[, ... ])
+                   [extends <identifier>(<input parameters>)] 
+                   [{ fields and methods }]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Car(val make: String, var reserved: Boolean) {
+     |   def reserve(r: Boolean): Unit = { reserved = r }
+     | }
+defined class Car
+
+scala> val t = new Car("Toyota", false)
+t: Car = Car@4eb48298
+
+scala> t.reserve(true)
+
+scala> println(s"My ${t.make} is now reserved? ${t.reserved}")
+My Toyota is now reserved? true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val t2 = new Car(reserved = false, make = "Tesla")
+t2: Car = Car@2ff4f00f
+
+scala> println(t2.make)
+Tesla
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Car(val make: String, var reserved: Boolean) {
+     |   def reserve(r: Boolean): Unit = { reserved = r }
+     | }
+defined class Car
+
+scala> class Lotus(val color: String, reserved: Boolean) extends 
+  Car("Lotus", reserved)
+defined class Lotus
+
+scala> val l = new Lotus("Silver", false)
+l: Lotus = Lotus@52c46334
+
+scala> println(s"Requested a ${l.color} ${l.make}")
+Requested a Silver Lotus
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+class <identifier> ([val|var] <identifier>: <type> = <expression>[, ... ])
+                   [extends <identifier>(<input parameters>)] 
+                   [{ fields and methods }]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Car(val make: String, var reserved: Boolean = true,
+     |           val year: Int = 2015) {
+     |   override def toString = s"$year $make, reserved = $reserved"
+     | }
+defined class Car
+
+scala> val a = new Car("Acura")                                   <1>
+a: Car = 2015 Acura, reserved = true
+
+scala> val l = new Car("Lexus", year = 2010)                      <2>
+l: Car = 2010 Lexus, reserved = true
+
+scala> val p = new Car(reserved = false, make = "Porsche")        <3>
+p: Car = 2015 Porsche, reserved = false
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+class <identifier> [type-parameters]
+                   ([val|var] <identifier>: <type> = <expression>[, ... ])
+                   [extends <identifier>[type-parameters](<input parameters>)] 
+                   [{ fields and methods }]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Singular[A](element: A) extends Traversable[A] {     <1>
+     |   def foreach[B](f: A => B) = f(element)                   <2>
+     | }
+defined class Singular
+
+scala> val p = new Singular("Planes")                             
+p: Singular[String] = (Planes)                                    <3>
+
+scala> p foreach println                                          <4>
+Planes
+
+scala> val name: String = p.head                                  <5>
+name: String = Planes
+--------------------------------------------------------------------------------
+
+
+==== More Class Types
+
+===== Abstract  Classes
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> abstract class Car {
+     |   val year: Int
+     |   val automatic: Boolean = true
+     |   def color: String
+     | }
+defined class Car
+
+scala> new Car()
+<console>:9: error: class Car is abstract; cannot be instantiated
+              new Car()
+
+scala> class RedMini(val year: Int) extends Car {
+     |   def color = "Red"
+     | }
+defined class RedMini
+
+scala> val m: Car = new RedMini(2005)
+m: Car = RedMini@5f5a33ed
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Mini(val year: Int, val color: String) extends Car
+defined class Mini
+
+scala> val redMini: Car = new Mini(2005, "Red")
+redMini: Car = Mini@1f4dd016
+
+scala> println(s"Got a ${redMini.color} Mini")
+Got a Red Mini
+--------------------------------------------------------------------------------
+
+
+===== Anonymous Classes
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> abstract class Listener { def trigger }
+defined class Listener
+
+scala> val myListener = new Listener {
+     |   def trigger { println(s"Trigger at ${new java.util.Date}") }
+     | }
+myListener: Listener = $anon$1@59831016
+
+scala> myListener.trigger
+Trigger at Fri Jan 24 13:08:51 PDT 2014
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> abstract class Listener { def trigger }
+defined class Listener
+
+scala> class Listening { 
+     |   var listener: Listener = null
+     |   def register(l: Listener) { listener = l }
+     |   def sendNotification() { listener.trigger }
+     | }
+defined class Listening
+
+scala> val notification = new Listening()
+notification: Listening = Listening@66596c4c
+
+scala> notification.register(new Listener {
+     |   def trigger { println(s"Trigger at ${new java.util.Date}") }
+     | })
+
+scala> notification.sendNotification
+Trigger at Fri Jan 24 13:15:32 PDT 2014
+--------------------------------------------------------------------------------
+
+
+==== More Field & Method Types
+
+===== Overloaded Methods
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Printer(msg: String) {
+     |   def print(s: String): Unit = println(s"$msg: $s")
+     |   def print(l: Seq[String]): Unit = print(l.mkString(", "))
+     | }
+defined class Printer
+
+scala> new Printer("Today's Report").print("Foggy" :: "Rainy" :: "Hot" :: Nil)
+Today's Report: Foggy, Rainy, Hot
+--------------------------------------------------------------------------------
+
+
+===== Apply Methods
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Multiplier(factor: Int) {
+     |   def apply(input: Int) = input * factor
+     | }
+defined class Multiplier
+
+scala> val tripleMe = new Multiplier(3)
+tripleMe: Multiplier = Multiplier@339cde4b
+
+scala> val tripled = tripleMe.apply(10)
+tripled: Int = 30
+
+scala> val tripled2 = tripleMe(10)
+tripled2: Int = 30
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val l = List('a', 'b', 'c')
+l: List[Char] = List(a, b, c)
+
+scala> val character = l(1)
+character: Char = b
+--------------------------------------------------------------------------------
+
+
+===== Lazy Values
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class RandomPoint {
+     |   val x = { println("creating x"); util.Random.nextInt }
+     |   lazy val y = { println("now y"); util.Random.nextInt }
+     | }
+defined class RandomPoint
+
+scala> val p = new RandomPoint()
+creating x
+p: RandomPoint = RandomPoint@6c225adb
+
+scala> println(s"Location is ${p.x}, ${p.y}")
+now y
+Location is 2019268581, -806862774
+
+scala> println(s"Location is ${p.x}, ${p.y}")
+Location is 2019268581, -806862774
+--------------------------------------------------------------------------------
+
+
+==== Packaging
+
+[source, scala]
+--------------------------------------------------------------------------------
+package <identifier>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+$ mkdir -p src/com/oreilly
+
+$ cat > src/com/oreilly/Config.scala
+package com.oreilly
+
+class Config(val baseUrl: String = "http://localhost")
+
+$ scalac src/com/oreilly/Config.scala 
+
+$ ls com/oreilly/Config.class 
+com/oreilly/Config.class
+--------------------------------------------------------------------------------
+
+
+===== Accessing Packaged Classes
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val d = new java.util.Date
+d: java.util.Date = Wed Jan 22 16:42:04 PDT 2014
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+import <package>.<class>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import java.util.Date
+import java.util.Date
+
+scala> val d = new Date
+d: java.util.Date = Wed Jan 22 16:49:17 PDT 2014
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> println("Your new UUID is " + {import java.util.UUID; UUID.randomUUID})
+Your new UUID is 47ba6844-3df5-403e-92cc-e429e614c9e5
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import java.util
+import java.util
+
+scala> val d = new util.Date
+d: java.util.Date = Wed Jan 2229 06:18:52 PDT 2014
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import collection.mutable._
+import collection.mutable._
+
+scala> val b = new ArrayBuffer[String]
+b: scala.collection.mutable.ArrayBuffer[String] = ArrayBuffer()
+
+scala> b += "Hello"
+res0: b.type = ArrayBuffer(Hello)
+
+scala> val q = new Queue[Int]
+q: scala.collection.mutable.Queue[Int] = Queue()
+
+scala> q.enqueue(3, 4, 5)
+
+scala> val pop = q.dequeue
+pop: Int = 3
+
+scala> println(q)
+Queue(4, 5)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+import <package>.{<class 1>[, <class 2>...]}
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import collection.mutable.{Queue,ArrayBuffer}
+import collection.mutable.{Queue, ArrayBuffer}
+
+scala> val q = new Queue[Int]
+q: scala.collection.mutable.Queue[Int] = Queue()
+
+scala> val b = new ArrayBuffer[String]
+b: scala.collection.mutable.ArrayBuffer[String] = ArrayBuffer()
+
+scala> val m = Map(1 -> 2)
+m: scala.collection.immutable.Map[Int,Int] = Map(1 -> 2)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+import <package>.{<original name>=><alias>}
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import collection.mutable.{Map=>MutMap}
+import collection.mutable.{Map=>MutMap}
+
+scala> val m1 = Map(1 -> 2)
+m1: scala.collection.immutable.Map[Int,Int] = Map(1 -> 2)
+
+scala> val m2 = MutMap(2 -> 3)
+m2: scala.collection.mutable.Map[Int,Int] = Map(2 -> 3)
+
+scala> m2.remove(2); println(m2)
+Map()
+--------------------------------------------------------------------------------
+
+
+===== Packaging Syntax
+
+[source, scala]
+--------------------------------------------------------------------------------
+package <identifier> { <class definitions> }
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> :paste -raw
+// Entering paste mode (ctrl-D to finish)
+
+package com {
+  package oreilly {
+    class Config(val baseUrl: String = "http://localhost")
+  }
+}
+
+// Exiting paste mode, now interpreting.
+
+scala> val url = new com.oreilly.Config().baseUrl
+url: String = http://localhost
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> :paste -raw
+// Entering paste mode (ctrl-D to finish)
+
+package com {
+  package oreilly {
+    class Config(val baseUrl: String = "http://localhost")
+  }
+}
+
+// Exiting paste mode, now interpreting.
+
+
+scala> val url = new com.oreilly.Config().baseUrl
+url: String = http://localhost
+--------------------------------------------------------------------------------
+
+
+==== Privacy Controls
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class User { protected val passwd = util.Random.nextString(10) }
+defined class User
+
+scala> class ValidUser extends User { def isValid = ! passwd.isEmpty }
+defined class ValidUser
+
+scala> val isValid = new ValidUser().isValid
+isValid: Boolean = true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class User(private var password: String) {
+     |   def update(p: String) {
+     |     println("Modifying the password!")
+     |     password = p
+     |   }
+     |   def validate(p: String) = p == password
+     | }
+defined class User
+
+scala> val u = new User("1234")
+u: User = User@94f6bfb
+
+scala> val isValid = u.validate("4567")
+isValid: Boolean = false
+
+scala> u.update("4567")
+Modifying the password!
+
+scala> val isValid = u.validate("4567")
+isValid: Boolean = true
+--------------------------------------------------------------------------------
+
+
+==== Privacy Access Modifiers
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> :paste -raw                                    
+// Entering paste mode (ctrl-D to finish)
+
+
+package com.oreilly {
+
+  private[oreilly] class Config {                                  <1>
+    val url = "http://localhost"
+  }
+  
+  class Authentication {
+    private[this] val password = "jason" // TODO change me         <2>
+    def validate = password.size > 0
+  }
+  
+  class Test {
+    println(s"url = ${new Config().url}")
+  }
+}  
+  
+
+// Exiting paste mode, now interpreting.
+
+
+scala> val valid = new com.oreilly.Authentication().validate       <3>
+valid: Boolean = true
+
+scala> new com.oreilly.Test
+url = http://localhost                                             <4>
+res0: com.oreilly.Test = com.oreilly.Test@4c309d4d
+
+scala> new com.oreilly.Config
+<console>:8: error: class Config in package oreilly cannot be      <5>
+  accessed in package com.oreilly
+              new com.oreilly.Config
+                              ^
+--------------------------------------------------------------------------------
+
+
+==== Final and Sealed Classes
+
+==== Summary
+
+==== Exercises
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val synth = javax.sound.midi.MidiSystem.getSynthesizer
+synth: javax.sound.midi.Synthesizer = com.sun.media.sound
+  .SoftSynthesizer@283a8ad6
+
+scala> synth.open()
+
+scala> val channel = synth.getChannels.head
+channel: javax.sound.midi.MidiChannel = com.sun.media.sound
+  .SoftChannelProxy@606d6d2c
+
+scala> channel.noteOn(50, 80); Thread.sleep(250); channel.noteOff(30) 
+
+scala> synth.close()
+--------------------------------------------------------------------------------
+
+
+=== 9. Objects, Case Classes and Traits
+
+==== Objects
+
+[source, scala]
+--------------------------------------------------------------------------------
+object <identifier> [extends <identifier>] [{ fields, methods, and classes }]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> object Hello { println("in Hello"); def hi = "hi" }
+defined object Hello
+
+scala> println(Hello.hi)
+in Hello
+hi
+
+scala> println(Hello.hi)
+hi
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> object HtmlUtils {
+     |   def removeMarkup(input: String) = {
+     |     input
+     |       .replaceAll("""</?\w[^>]*>""","")
+     |       .replaceAll("<.*>","")
+     |   }
+     | }
+defined object HtmlUtils
+
+scala> val html = "<html><body><h1>Introduction</h1></body></html>"
+html: String = <html><body><h1>Introduction</h1></body></html>
+
+scala> val text = HtmlUtils.removeMarkup(html)
+text: String = Introduction
+--------------------------------------------------------------------------------
+
+
+======= Apply Methods And Companion Objects
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+class Multiplier(val x: Int) { def product(y: Int) = x * y }
+
+object Multiplier { def apply(x: Int) = new Multiplier(x) }
+
+// Exiting paste mode, now interpreting.
+
+defined class Multiplier
+defined object Multiplier
+
+scala> val tripler = Multiplier(3)
+tripler: Multiplier = Multiplier@5af28b27
+
+scala> val result = tripler.product(13)
+result: Int = 39
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+object DBConnection { 
+  private val db_url = "jdbc://localhost"
+  private val db_user = "franken"
+  private val db_pass = "berry"
+  
+  def apply() = new DBConnection
+}
+
+class DBConnection {
+  private val props = Map(
+    "url" -> DBConnection.db_url, 
+    "user" -> DBConnection.db_user, 
+    "pass" -> DBConnection.db_pass
+  )
+  println(s"Created new connection for " + props("url"))
+}
+
+// Exiting paste mode, now interpreting.
+
+defined object DBConnection
+defined class DBConnection
+
+scala> val conn = DBConnection()
+Created new connection for jdbc://localhost
+conn: DBConnection = DBConnection@4d27d9d
+--------------------------------------------------------------------------------
+
+
+===== Command-Line Applications With Objects
+
+[source, scala]
+--------------------------------------------------------------------------------
+$ cat > Date.scala
+object Date {
+  def main(args: Array[String]) {
+    println(new java.util.Date)
+  }
+}
+
+$ scalac Date.scala
+
+$ scala Date
+Mon Sep 01 22:03:09 PDT 2014
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+$ cat > Cat.scala
+object Cat {
+  def main(args: Array[String]) {
+    for (arg <- args) {
+      println( io.Source.fromFile(arg).mkString )
+    }
+  }
+}
+
+$ scalac Cat.scala
+
+$ scala Cat Date.scala
+object Date {
+  def main(args: Array[String]) {
+    println(new java.util.Date)
+  }
+}
+--------------------------------------------------------------------------------
+
+
+==== Case Classes
+
+[source, scala]
+--------------------------------------------------------------------------------
+case class <identifier> ([var] <identifier>: <type>[, ... ])
+                        [extends <identifier>(<input parameters>)] 
+                        [{ fields and methods }]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> case class Character(name: String, isThief: Boolean)
+defined class Character
+
+scala> val h = Character("Hadrian", true)                    <1>
+h: Character = Character(Hadrian,true)                       <2>
+
+scala> val r = h.copy(name = "Royce")                        <3>
+r: Character = Character(Royce,true)
+
+scala> h == r                                                <4>
+res0: Boolean = false
+
+scala> h match {
+     |   case Character(x, true) => s"$x is a thief"         <5>
+     |   case Character(x, false) => s"$x is not a thief"
+     | }
+res1: String = Hadrian is a thief
+--------------------------------------------------------------------------------
+
+
+==== Traits
+
+[source, scala]
+--------------------------------------------------------------------------------
+trait <identifier> [extends <identifier>] [{ fields, methods, and classes }]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> trait HtmlUtils {
+     |   def removeMarkup(input: String) = {
+     |     input
+     |       .replaceAll("""</?\w[^>]*>""","")
+     |       .replaceAll("<.*>","")
+     |   }
+     | }
+defined trait HtmlUtils
+
+scala> class Page(val s: String) extends HtmlUtils {
+     |   def asPlainText = removeMarkup(s)
+     | }
+defined class Page
+
+scala> new Page("<html><body><h1>Introduction</h1></body></html>").asPlainText
+res2: String = Introduction
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> trait SafeStringUtils {
+     | 
+     |   // Returns a trimmed version of the string wrapped in an Option, 
+     |   // or None if the trimmed string is empty.
+     |   def trimToNone(s: String): Option[String] = {
+     |     Option(s) map(_.trim) filterNot(_.isEmpty)
+     |   }
+     | }
+defined trait SafeStringUtils
+
+scala> class Page(val s: String) extends SafeStringUtils with HtmlUtils {
+     |   def asPlainText: String = {
+     |     trimToNone(s) map removeMarkup getOrElse "n/a"
+     |   }
+     | }
+defined class Page
+
+scala> new Page("<html><body><h1>Introduction</h1></body></html>").asPlainText
+res3: String = Introduction
+
+scala> new Page("  ").asPlainText
+res4: String = n/a
+
+scala> new Page(null).asPlainText
+res5: String = n/a
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> trait Base { override def toString = "Base" }
+defined trait Base
+
+scala> class A extends Base { override def toString = "A->" + super.toString }
+defined class A
+
+scala> trait B extends Base { override def toString = "B->" + super.toString }
+defined trait B
+
+scala> trait C extends Base { override def toString = "C->" + super.toString }
+defined trait C
+
+scala> class D extends A with B with C { override def toString = "D->" + 
+  super.toString }
+defined class D
+
+scala> new D()
+res50: D = D->C->B->A->Base
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class RGBColor(val color: Int) { def hex = f"$color%06X" }       
+defined class RGBColor
+
+scala> val green = new RGBColor(255 << 8).hex
+green: String = 00FF00
+
+scala> trait Opaque extends RGBColor { override def hex = s"${super.hex}FF" }
+defined trait Opaque
+
+scala> trait Sheer extends RGBColor { override def hex = s"${super.hex}33" }
+defined trait Sheer
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Paint(color: Int) extends RGBColor(color) with Opaque
+defined class Paint
+
+scala> class Overlay(color: Int) extends RGBColor(color) with Sheer
+defined class Overlay
+
+scala> val red = new Paint(128 << 16).hex
+red: String = 800000FF
+
+scala> val blue = new Overlay(192).hex
+blue: String = 0000C033
+--------------------------------------------------------------------------------
+
+
+===== Self Types
+
+[source, scala]
+--------------------------------------------------------------------------------
+trait ..... { <identifier>: <type> => .... }
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class A { def hi = "hi" }
+defined class A
+
+scala> trait B { self: A =>                                              <1>
+     |   override def toString = "B: " + hi
+     | }
+defined trait B
+
+scala> class C extends B
+<console>:9: error: illegal inheritance;                                 <2>
+ self-type C does not conform to B's selftype B with A
+       class C extends B
+                       ^
+
+scala> class C extends A with B                                          <3>
+defined class C
+
+scala> new C()
+res1: C = B: hi                                                          <4>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class TestSuite(suiteName: String) { def start() {} }                <1>
+defined class TestSuite
+
+scala> trait RandomSeeded { self: TestSuite =>                              <2>
+     |   def randomStart() { 
+     |     util.Random.setSeed(System.currentTimeMillis)
+     |     self.start()
+     |   }
+     | }
+defined trait RandomSeeded
+
+scala> class IdSpec extends TestSuite("ID Tests") with RandomSeeded {       <3>
+     |   def testId() { println(util.Random.nextInt != 1) }
+     |   override def start() { testId() }
+     |   
+     |   println("Starting...")
+     |   randomStart()
+     | }
+defined class IdSpec
+--------------------------------------------------------------------------------
+
+
+===== Instantiation With Traits
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class A
+defined class A
+
+scala> trait B { self: A => }
+defined trait B
+
+scala> val a = new A with B
+a: A with B = $anon$1@26a7b76d
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class User(val name: String) { 
+     |   def suffix = ""
+     |   override def toString = s"$name$suffix"
+     | }
+defined class User
+
+scala> trait Attorney { self: User => override def suffix = ", esq." }
+defined trait Attorney
+
+scala> trait Wizard { self: User => override def suffix = ", Wizard" }
+defined trait Wizard
+
+scala> trait Reverser { override def toString = super.toString.reverse }
+defined trait Reverser
+
+scala> val h = new User("Harry P") with Wizard
+h: User with Wizard = Harry P, Wizard
+
+scala> val g = new User("Ginny W") with Attorney
+g: User with Attorney = Ginny W, esq.
+
+scala> val l = new User("Luna L") with Wizard with Reverser
+l: User with Wizard with Reverser = draziW ,L anuL
+--------------------------------------------------------------------------------
+
+
+==== Importing Instance Members
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> case class Receipt(id: Int, amount: Double, who: String, title: String)
+defined class Receipt
+
+scala> {
+     |   val latteReceipt = Receipt(123, 4.12, "fred", "Medium Latte")
+     |   import latteReceipt._
+     |   println(s"Sold a $title for $amount to $who")
+     | }
+Sold a Medium Latte for 4.12 to fred
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> import util.Random._
+import util.Random._
+
+scala> val letters = alphanumeric.take(20).toList.mkString
+letters: String = MwDR3EyHa1cr0JqsP9Tf
+
+scala> val numbers = shuffle(1 to 20)
+numbers: scala.collection.immutable.IndexedSeq[Int] = Vector(5, 10, 18, 1, 
+  16, 8, 20, 14, 19, 11, 17, 3, 15, 7, 4, 9, 6, 12, 13, 2)
+--------------------------------------------------------------------------------
+
+
+==== Summary
+
+==== Break - Configuring Your First Scala Project 
+
+[source, scala]
+--------------------------------------------------------------------------------
+[HardyHeron] > mkdir -p src/main/scala
+ 
+[HardyHeron] > cat > src/main/scala/Hello.scala
+
+object Hello {
+  def main(args: Array[String]) {
+    println("Hello from SBT")
+  }
+}
+
+[HardyHeron] > sbt run
+[info] Set current project to hardyheron (in build file:~/HardyHeron/)
+[info] Updating {file:~/HardyHeron/}hardyheron...
+[info] Resolving org.fusesource.jansi#jansi;1.4 ...
+[info] Done updating.
+[info] Compiling 1 Scala source to ~/HardyHeron/target/scala-2.10/classes...
+[info] Running Hello 
+Hello from SBT
+[success] Total time: 3 s, completed June 6, 2014 10:38:08 PM
+ 
+[HardyHeron] >
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+[HardyHeron] > cat > project/HardyHeronBuild.scala
+
+import sbt._                                                                <1>
+import sbt.Keys._
+
+object HardyHeronBuild extends Build                                        <2>
+{
+  val hardyHeronDependencies = List(
+    "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"                   <3>
+  )
+
+  val hardyHeronSettings = List(                                            <4>
+    name := "HardyHeron",
+    version := "1.0",
+    scalaVersion := "2.11.2",
+    libraryDependencies := hardyHeronDependencies
+  )
+
+  override lazy val settings = super.settings ++ hardyHeronSettings         <5>
+}
+
+[HardyHeron] > 
+
+[HardyHeron] > sbt compile
+[info] Loading project definition from ~/HardyHeron/project
+[info] Compiling 1 Scala source to ~/HardyHeron/project/target/scala-2.10/
+  sbt-0.13/classes...
+[info] Set current project to hardyheron (in build file:~/HardyHeron/)
+[info] Updating {file:~/HardyHeron/}hardyheron...
+[info] Resolving jline#jline;2.12 ...
+[info] downloading http://repo1.maven.org/maven2/org/scalatest/             <6>
+  scalatest_2.11/2.2.1/scalatest_2.11-2.2.1.jar ...
+[info]  [SUCCESSFUL ] org.scalatest#scalatest_2.11;2.2.1!scalatest_2.11.jar
+  (bundle) (5232ms)
+[info] Done updating.
+[success] Total time: 7 s, completed June 7, 2014 12:49:44 AM
+
+[HardyHeron] > sbt "run Hello"                                              <7>
+[info] Loading project definition from ~/HardyHeron/project
+[info] Set current project to hardyheron (in build file:~/HardyHeron/)
+[info] Running Hello 
+Hello from SBT
+[success] Total time: 0 s, completed June 7, 2014 12:58:43 AM
+
+[HardyHeron] >
+--------------------------------------------------------------------------------
+
+
+==== Exercises
+
+[source, scala]
+--------------------------------------------------------------------------------
+object HtmlUtils {
+  def removeMarkup(input: String) = {
+    input
+      .replaceAll("""</?\w[^>]*>""","")
+      .replaceAll("<.*>","")
+  }
+}
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+import org.scalatest._                                                      
+
+class HtmlUtilsSpec extends FlatSpec with ShouldMatchers {                  
+
+  "The Html Utils object" should "remove single elements" in {              
+    HtmlUtils.removeMarkup("<br/>") should equal("")                        
+  }
+
+  it should "remove paired elements" in {
+    HtmlUtils.removeMarkup("<b>Hi</b>") should equal("Hi")
+  }
+
+  it should "have no effect on empty strings" in {
+    val empty = true
+    HtmlUtils.removeMarkup("").isEmpty should be(empty)                     
+  }
+
+}
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+trait SafeStringUtils {
+  // Returns a trimmed version of the string wrapped in an Option, 
+  // or None if the trimmed string is empty.
+  def trimToNone(s: String): Option[String] = {
+    Option(s) map(_.trim) filterNot(_.isEmpty)
+  }
+}
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+import java.io._
+val writer = new PrintWriter(new File("out.txt"))
+writer.write("Hello, World!\nHere I am!")
+writer.close()
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+https://api.github.com/repos/scala/scala/issues?state=closed&per_page=10
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+"org.json4s" %% "json4s-native" % "3.2.10"
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+import org.json4s.DefaultFormats                                          <1>
+import org.json4s.native.JsonMethods                                      <2>
+
+val jsonText = """
+{
+  "labels": [
+    {
+      "url": "https://api.github.com/repos/scala/scala/labels/tested",
+      "name": "tested",
+      "color": "d7e102"
+    }
+  ]
+}
+"""
+
+case class Label(url: String, name: String)                               <3>
+case class LabelDocument(labels: List[Label])                             <4>
+  
+implicit val formats = DefaultFormats                                     <5>
+val labelDoc = JsonMethods.parse(jsonText).extract[LabelDocument]         <6>
+
+val labels = labelDoc.labels
+val firstLabel = labels.headOption.map(_.name)
+--------------------------------------------------------------------------------
+
+
+=== 10. Advanced Typing
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val t1: (Int, Char) = (1, 'a')
+t1: (Int, Char) = (1,a)
+
+scala> val t2: (Int, Char) = Tuple2[Int, Char](1, 'a')
+t2: (Int, Char) = (1,a)
+
+scala> val f1: Int=>Int = _ + 2
+f1: Int => Int = <function1>
+
+scala> val f2: Int=>Int = new Function1[Int, Int] { def apply(x: Int) = x * 2 }
+f2: Int => Int = <function1>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> object ImplicitClasses {
+     |   implicit class Hello(s: String) { def hello = s"Hello, $s" }
+     |   def test = {
+     |     println( "World".hello )
+     |   }
+     | }
+defined object ImplicitClasses
+
+scala> ImplicitClasses.test
+Hello, World
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> object ImplicitParams {
+     |   def greet(name: String)(implicit greeting: String) = s"$greeting, $name"
+     |   implicit val hi = "Hello"
+     |   def test = {
+     |     println( greet("Developers") )
+     |   }
+     | }
+defined object ImplicitParams
+
+scala> ImplicitParams.test
+Hello, Developers
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Base { var i = 10 }; class Sub extends Base
+defined class Base
+defined class Sub
+
+scala> def increment[B <: Base](b: Base) = { b.i += 1; b }
+increment: [B <: Base](b: Base)Base
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val l: List[Base] = List[Sub]()
+l: List[Base] = List()
+--------------------------------------------------------------------------------
+
+
+==== Tuple And Function Value Classes 
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val x: (Int, Int) = Tuple2(10, 20)
+x: (Int, Int) = (10,20)
+
+scala> println("Does the arity = 2? " + (x.productArity == 2))
+Does the arity = 2? true
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val hello1 = (n: String) => s"Hello, $n"
+hello1: String => String = <function1>
+
+scala> val h1 = hello1("Function Literals")
+h1: String = Hello, Function Literals
+
+scala> val hello2 = new Function1[String,String] { 
+     |   def apply(n: String) = s"Hello, $n"
+     | }
+hello2: String => String = <function1>
+
+scala> val h2 = hello2("Function1 Instances")
+h2: String = Hello, Function1 Instances
+
+scala> println(s"hello1 = $hello1, hello2 = $hello2")
+hello1 = <function1>, hello2 = <function1>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> val doubler = (i: Int) => i*2
+doubler: Int => Int = <function1>
+
+scala> val plus3 = (i: Int) => i+3
+plus3: Int => Int = <function1>
+
+scala> val prepend = (doubler compose plus3)(1)
+prepend: Int = 8
+
+scala> val append = (doubler andThen plus3)(1)
+append: Int = 5
+--------------------------------------------------------------------------------
+
+
+==== Implicit Parameters
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> object Doubly {
+     |   def print(num: Double)(implicit fmt: String) = {
+     |     println(fmt format num)
+     |   }
+     | }
+defined object Doubly
+
+scala> Doubly.print(3.724)
+<console>:9: error: could not find implicit value for parameter fmt: String
+              Doubly.print(3.724)
+
+scala> Doubly.print(3.724)("%.1f")
+3.7
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> case class USD(amount: Double) {
+     |   implicit val printFmt = "%.2f"
+     |   def print = Doubly.print(amount)
+     | }
+defined class USD
+
+scala> new USD(81.924).print
+81.92
+--------------------------------------------------------------------------------
+
+
+==== Implicit Classes
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> object IntUtils {
+     |   implicit class Fishies(val x: Int) {                               <1>
+     |     def fishes = "Fish" * x                                          <2>
+     |   }
+     | }
+defined object IntUtils
+ 
+scala> import IntUtils._                                                    <3>
+import IntUtils._
+
+scala> println(3.fishes)                                                    <4>
+FishFishFish
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+implicit class ArrowAssoc[A](x: A) {
+  def ->[B](y: B) = Tuple2(x, y)
+}
+--------------------------------------------------------------------------------
+
+
+==== Types
+
+===== Type Aliases
+
+[source, scala]
+--------------------------------------------------------------------------------
+type <identifier>[type parameters] = <type name>[type parameters]
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> object TypeFun {
+     |   type Whole = Int
+     |   val x: Whole = 5
+     | 
+     |   type UserInfo = Tuple2[Int,String]
+     |   val u: UserInfo = new UserInfo(123, "George")
+     | 
+     |   type T3[A,B,C] = Tuple3[A,B,C]
+     |   val things = new T3(1, 'a', true)
+     | }
+defined object TypeFun
+
+scala> val x = TypeFun.x
+x: TypeFun.Whole = 5
+
+scala> val u = TypeFun.u
+u: TypeFun.UserInfo = (123,George)
+
+scala> val things = TypeFun.things
+things: (Int, Char, Boolean) = (1,a,true)
+--------------------------------------------------------------------------------
+
+
+===== Abstract Types
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class User(val name: String)
+defined class User
+
+scala> trait Factory { type A; def create: A }
+defined trait Factory
+
+scala> trait UserFactory extends Factory { 
+     |   type A = User
+     |   def create = new User("")
+     | }
+defined trait UserFactory
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> trait Factory[A] { def create: A }
+defined trait Factory
+
+scala> trait UserFactory extends Factory[User] { def create = new User("") }
+defined trait UserFactory
+--------------------------------------------------------------------------------
+
+
+===== Bounded Types
+
+[source, scala]
+--------------------------------------------------------------------------------
+<identifier> <: <upper bound type>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class BaseUser(val name: String)
+defined class BaseUser
+
+scala> class Admin(name: String, val level: String) extends BaseUser(name)
+defined class Admin
+
+scala> class Customer(name: String) extends BaseUser(name)
+defined class Customer
+
+scala> class PreferredCustomer(name: String) extends Customer(name)
+defined class PreferredCustomer
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def check[A <: BaseUser](u: A) { if (u.name.isEmpty) println("Fail!") }
+check: [A <: BaseUser](u: A)Unit
+
+scala> check(new Customer("Fred"))
+
+scala> check(new Admin("", "strict"))
+Fail!
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+<identifier> >: <lower bound type>
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> def recruit[A >: Customer](u: Customer): A = u match { 
+     |   case p: PreferredCustomer => new PreferredCustomer(u.name)
+     |   case c: Customer => new Customer(u.name)
+     | }
+recruit: [A >: Customer](u: Customer)A
+
+scala> val customer = recruit(new Customer("Fred"))
+customer: Customer = Customer@4746fb8c
+
+scala> val preferred = recruit(new PreferredCustomer("George"))
+preferred: Customer = PreferredCustomer@4cd8db31
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> abstract class Card { 
+     |   type UserType <: BaseUser
+     |   def verify(u: UserType): Boolean
+     | 
+     | }
+defined class Card
+
+scala> class SecurityCard extends Card {
+     |   type UserType = Admin
+     |   def verify(u: Admin) = true
+     | }
+defined class SecurityCard
+
+scala> val v1 = new SecurityCard().verify(new Admin("George", "high"))
+v1: Boolean = true
+
+scala> class GiftCard extends Card {
+     |   type UserType = Customer
+     |   def verify(u: Customer) = true
+     | }
+defined class GiftCard
+
+scala> val v2 = new GiftCard().verify(new Customer("Fred"))
+v2: Boolean = true
+--------------------------------------------------------------------------------
+
+
+===== Type Variance
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Car { override def toString = "Car()" }
+defined class Car
+
+scala> class Volvo extends Car { override def toString = "Volvo()" }
+defined class Volvo
+
+scala> val c: Car = new Volvo()
+c: Car = Volvo()
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> case class Item[A](a: A) { def get: A = a }
+defined class Item
+
+scala> val c: Item[Car] = new Item[Volvo](new Volvo)
+<console>:12: error: type mismatch;
+ found   : Item[Volvo]
+ required: Item[Car]
+Note: Volvo <: Car, but class Item is invariant in type A.
+You may wish to define A as +A instead. (SLS 4.5)
+       val c: Item[Car] = new Item[Volvo](new Volvo)
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> case class Item[+A](a: A) { def get: A = a }
+defined class Item
+
+scala> val c: Item[Car] = new Item[Volvo](new Volvo)
+c: Item[Car] = Item(Volvo())
+
+scala> val auto = c.get
+auto: Car = Volvo()
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Check[+A] { def check(a: A) = {} }
+<console>:7: error: covariant type A occurs in contravariant position in 
+  type A of value a
+       class Check[+A] { def check(a: A) = {} }
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Check[-A] { def check(a: A) = {} }
+defined class Check
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Check[A] { def check(a: A) = {} }
+defined class Check
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> class Car; class Volvo extends Car; class VolvoWagon extends Volvo
+defined class Car
+defined class Volvo
+defined class VolvoWagon
+
+scala> class Item[+A](a: A) { def get: A = a }
+defined class Item
+
+scala> class Check[-A] { def check(a: A) = {} }
+defined class Check
+
+scala> def item(v: Item[Volvo]) { val c: Car = v.get }
+item: (v: Item[Volvo])Unit
+
+scala> def check(v: Check[Volvo]) { v.check(new VolvoWagon()) }
+check: (v: Check[Volvo])Unit
+--------------------------------------------------------------------------------
+
+
+[source, scala]
+--------------------------------------------------------------------------------
+scala> item( new Item[Car](new Car()) )                                    <1>
+<console>:14: error: type mismatch;
+ found   : Item[Car]
+ required: Item[Volvo]
+              item( new Item[Car](new Car()) )
+                    ^
+
+scala> item( new Item[Volvo](new Volvo) )
+
+scala> item( new Item[VolvoWagon](new VolvoWagon()) )                      <2>
+
+scala> check( new Check[Car]() )                                           <3>
+
+scala> check( new Check[Volvo]() )
+
+scala> check( new Check[VolvoWagon]() )                                    <4>
+<console>:14: error: type mismatch;
+ found   : Check[VolvoWagon]
+ required: Check[Volvo]
+              check( new Check[VolvoWagon]() )
+--------------------------------------------------------------------------------
+
+
+===== Package Objects
+
+[source, scala]
+--------------------------------------------------------------------------------
+// located on com/oreilly/package.scala
+package object oreilly {
+  type Mappy[A,B] = collection.mutable.HashMap[A,B]
+}
+--------------------------------------------------------------------------------
+
+
+==== Summary 
+
+==== Questions
+
