@@ -1,0 +1,15 @@
+
+
+== Errata
+
+
+=== Chapter 1 - Getting Started
+
+==== Exercises
+
+5) Another way to load external Scala code is to paste it into the repl in "raw" mode, where the code is compiled as if it were actually in a proper source file. To do this, type ":paste -raw", hit return, and then paste the contents of your source file from exercise 4. After exiting "paste" mode you should see the greeting.
+
+****
+The "raw" mode here is a mistake. Please use ":paste", not ":paste -raw". 
+****
+
