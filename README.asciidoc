@@ -7,7 +7,7 @@ Supplementary materials for http://shop.oreilly.com/product/0636920030287.do[Lea
 == Source Listings
 
 
-The https://github.com/swartzrock/LearningScalaMaterials/blob/master/Sources/source_listings.asciidoc[source code for every code block] in the book is available.
+The https://github.com/swartzrock/LearningScalaMaterials/blob/master/Sources/source_listings.asciidoc[source code for all of the book's code blocks] are available.
 
 
 == Answers to Exercises 
