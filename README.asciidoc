@@ -22,6 +22,8 @@ Answers to exercises in the first four chapters are now available. The answers f
 
 * https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/ch4-Functions.asciidoc[Chapter 4 - Functions] 
 
+* https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/ch5-FirstClassFunctions.asciidoc[Chapter 5 - First Class Functions] 
+
 
 
 == Errata
