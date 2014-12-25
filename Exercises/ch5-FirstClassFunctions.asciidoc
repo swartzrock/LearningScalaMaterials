@@ -1,0 +1,295 @@
+
+1) Write a function literal that takes two integers and returns the higher number. Then write a higher-order function that takes a 3-sized tuple of integers plus this function literal, and uses it to return the maximum value in the tuple.
+
+*Answer*
+
+The answer to the first part of the question is to write a _lambda expression_, i.e. a function literal. If you can write this answer then you'll understand lambda expressions and function literals.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val max = (x: Int, y: Int) => if (x > y) x else y
+max: (Int, Int) => Int = <function2>
+
+scala> max(23, 32)
+res0: Int = 32
+-------------------------------------------------------------------------------
+
+The second part of the question should give you pause. After all, how can you use a two-input function literal to compare three numbers? Hopefully you were able to figure out something like this:
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def pickOne(t: (Int, Int, Int), cmp: (Int, Int) => Int): Int = { 
+     |   cmp(t._1, cmp(t._2, t._3)) 
+     | }
+pickOne: (t: (Int, Int, Int), cmp: (Int, Int) => Int)Int
+
+scala> pickOne( (14, 7, 9), max )
+res1: Int = 14
+-------------------------------------------------------------------------------
+
+
+
+2) The library function +util.Random.nextInt+ returns a random integer. Use it to invoke the "max" function with two random integers plus a function that returns the larger of two given integers. Do the same with a function that returns the smaller of two given integers, and then a function that returns the second integer every time. 
+
+*Answer*
+
+This should say "with three random integers", as the answer to the previous question was a function with a three-sized tuple and a comparison function. The max function is the function literal that takes two input numbers.
+
+First, here's the "max()" function literal invoked with two random numbers.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> max(util.Random.nextInt, util.Random.nextInt)
+res0: Int = 1436693791
+-------------------------------------------------------------------------------
+
+To keep our code brief and avoid retyping "util.Random.nextInt", let's add a wrapper function.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def nextInt = util.Random.nextInt
+nextInt: Int
+
+scala> max(nextInt, nextInt)
+res1: Int = 1955118075
+-------------------------------------------------------------------------------
+
+Okay, here's the "pickOne()" function invoked with three random numbers and the "max()" comparison function literal.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val t = (nextInt, nextInt, nextInt)
+t: (Int, Int, Int) = (-233084145,1722379081,683222211)
+
+scala> pickOne(t, max)
+res2: Int = 1722379081
+-------------------------------------------------------------------------------
+
+Let's try some varieties of the comparison functions. Since we're passing in function literals, this should be straightforward.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val t = (nextInt, nextInt, nextInt)
+t: (Int, Int, Int) = (433839089,-1002398428,2101699998)
+
+scala> pickOne(t, (x, y) => if (x < y) x else y)
+res3: Int = -1002398428
+
+scala> val t = (nextInt, nextInt, nextInt)
+t: (Int, Int, Int) = (913142586,1268532435,94040930)
+
+scala> pickOne(t, (x, y) => x)
+res4: Int = 913142586
+-------------------------------------------------------------------------------
+
+
+
+3) Write a higher-order function that takes an integer and returns a function. The returned function should take a single integer argument (say, "x") and return the product of x and the integer passed to the higher-order function. 
+
+*Answer*
+
+Here's our first higher-order function in the exercises which returns another function. While the exercise's description is necessarily complicated, talking about the higher-order function AND the function it returns, the answer is fortunately brief.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def multy(x: Int) = (y: Int) => x * y
+multy: (x: Int)Int => Int
+-------------------------------------------------------------------------------
+
+Let's try it out!
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val tripler = multy(3)
+tripler: Int => Int = <function1>
+
+scala> tripler(10)
+res4: Int = 30
+-------------------------------------------------------------------------------
+
+
+
+4) Let's say that you happened to run across this function while reviewing another developer's code: 
+
+`def fzero[A](x: A)(f: A => Unit): A = { f(x); x }`
+
+What does this function accomplish? Can you give an example of how you might invoke it?
+
+*Answer*
+
+The purpose of this exercise is to help you gain familiarity with Scala's higher-order functions in the field. Here's a helper function that may appear mysterious at first (especially its fabulous display of punctionation and single-letter type names), but after careful reading will become understandable.
+
+Would it be easier to read this function if it was bound to a specific type, and the two parameter lists combined? Here's the "fzero()" method simplified and redefined with an explicit +String+ type.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def fzero(x: String, f: String => Unit): String = { f(x); x }
+fzero: (x: String, f: String => Unit)String
+
+scala> fzero("Hello", s => println(s.reverse))
+olleH
+res0: String = Hello
+-------------------------------------------------------------------------------
+
+The "fzero()" function, in specialized and simplified form here, executes the given function parameter on a given value and then returns the original value. The original version in the exercise adds type parameters and currying support.
+
+Here's an example of invoking the original function with a specific type and separate parameter lists.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> fzero[Boolean](false) { b => println(s"b was $b") }
+b was false
+res1: Boolean = false
+-------------------------------------------------------------------------------
+
+
+
+5) There's a function named "square" that you would like to store in a function value. Is this the right way to do it? How else can you store a function in a value?
+
+-------------------------------------------------------------------------------
+def square(m: Double) = m * m
+val sq = square
+-------------------------------------------------------------------------------
+
+*Answer*
+
+If you haven't figured it out, try the example code in the REPL.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def square(m: Double) = m * m
+square: (m: Double)Double
+
+scala> val sq = square
+<console>:8: error: missing arguments for method square;
+follow this method with `_' if you want to treat it as a partially applied function
+       val sq = square
+-------------------------------------------------------------------------------
+
+Indeed, using a wildcard to assign a function would help make "sq" into a function value. Or, alternatively, give it the explicit type of a function value.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val sq = square _
+sq: Double => Double = <function1>
+
+scala> sq1(4.0)
+res0: Double = 16.0
+
+scala> val sq: Double => Double = square
+sq: Double => Double = <function1>
+
+scala> sq(5.0)
+res2: Double = 25.0
+-------------------------------------------------------------------------------
+
+
+
+
+6) Write a function called "conditional" that takes a value x and two functions, p and f, and returns a value of the same type as x. The p function is a predicate, taking the value x and returning a +Boolean+ b. The f function also takes the value x and returns a new value of the same type. Your "conditional" function should only invoke the function f(x) if p(x) is true, and otherwise return x. How many type parameters will the "conditional" function require?
+
+*Answer*
+
+Another example of the question being far longer than the answer. Here's our "conditional()" function with a value parameter and two function parameters. We'll try it out with a predicate that will fail with the given input, verifying that the original input is returned.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def conditional[A](x: A, p: A => Boolean, f: A => A): A = {
+     |   if (p(x)) f(x) else x
+     | }
+conditional: [A](x: A, p: A => Boolean, f: A => A)A
+
+scala> val a = conditional[String]("yo", _.size > 4, _.reverse)
+a: String = yo
+-------------------------------------------------------------------------------
+
+
+
+
+
+7) Do you recall the "typesafe" challenge from the exercises in <<expressions_ch>>? There is a popular coding interview question I'll call "typesafe", in which the numbers 1 - 100 must be printed one per line. The catch is that multiples of 3 must replace the number with the word "type", while multiples of 5 must replace the number with the word "safe". Of course, multiples of 15 must print "typesafe". 
+
+Use the "conditional" function from exercise 6 to implement this challenge.
+
+Would your solution be shorter if the return type of "conditional" did not match the type of the parameter x? Experiment with an altered version of the "conditional" function that works better with this challenge.
+
+*Answer*
+
+Here's one example of using the "conditional" function to produce the "typesafe" sequence. In this one, the predicate function checks if the current iteration matches multiples of either 3 or 5, whie the other function prints a message and returns zero. 
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> for (i <- 1 to 100) {
+     |   val a1 = conditional[Int](i, _ % 3 == 0, x => { print("type"); 0 })
+     |   val a2 = conditional[Int](i, _ % 5 == 0, x => { print("safe"); 0 })
+     |   if (a1 > 0 && a2 > 0) print(i)
+     |   println("")
+     | }
+1
+2
+type
+4
+safe
+...
+-------------------------------------------------------------------------------
+
+This isn't a great solution, however. The function literals are writing to the console, a side-effect that one shouldn't have to see in good functional programming exercise answers. 
+
+To fix this, let's rework the "conditional" function so it can take a number and return a string. If the given predicate is false, it should return an empty string. We can then use the output strings to create a single final result string for printing (or for re.turning from a function)
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def conditional[A](x: A, p: A => Boolean, f: A => String): String = {
+     |   if (p(x)) f(x) else ""
+     | }
+conditional: [A](x: A, p: A => Boolean, f: A => String)String
+
+scala> for (i <- 1 to 100) {
+     |   val a1 = conditional[Int](i, _ % 3 == 0, _ => "type")
+     |   val a2 = conditional[Int](i, _ % 5 == 0, _ => "safe")
+     |   val a3 = conditional[Int](i, _ % 3 > 0 && i % 5 > 0, x => s"$x")
+     |   println(a1 + a2 + a3)
+     | }
+1
+2
+type
+4
+safe
+-------------------------------------------------------------------------------
+
+Now the only side effect is in the single "println" statement at the end of each loop. How about we do one more iteration to clean it up, converting the loop's code into a function that takes a single number and returns the correct response? This way we can separate the loop and printout code from the core logic.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def typeSafely(i: Int): String = {
+     |   val a1 = conditional[Int](i, _ % 3 == 0, _ => "type")
+     |   val a2 = conditional[Int](i, _ % 5 == 0, _ => "safe")
+     |   val a3 = conditional[Int](i, _ % 3 > 0 && i % 5 > 0, x => s"$x")
+     |   a1 + a2 + a3
+     | }
+typeSafely: (i: Int)String
+
+scala> val sequence = 1 to 100 map typeSafely
+sequence: scala.collection.immutable.IndexedSeq[String] = Vector(1, 2, type, 4, safe, type, 7, 8, ...)
+
+scala> println(sequence.mkString("\n"))
+1
+2
+type
+4
+safe
+type
+...
+-------------------------------------------------------------------------------
+
+
+Our sequence generation, handled with the updated "conditional" function, is now packaged in a reusable function.
+
+
+
+
+
+
