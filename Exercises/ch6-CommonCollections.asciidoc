@@ -5,6 +5,22 @@
 *Answer*
 
 
+There's many ways to generate this list with the collections library, too many to list here. Here are some examples of generating it with a for-loop,  filtering, and  mapping.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> for (i <- 0L to 9L; j = i * 2 + 1) yield j
+res0: scala.collection.immutable.IndexedSeq[Long] = Vector(1, 3, 5, 7, 9, 
+11, 13, 15, 17, 19)
+
+scala> 0L to 20L filter (_ % 2 == 1)
+res1: scala.collection.immutable.IndexedSeq[Long] = Vector(1, 3, 5, 7, 9, 11, 13, 15, 17, 19)
+
+scala> 0L to 9L map (_ * 2 + 1)
+res2: scala.collection.immutable.IndexedSeq[Long] = Vector(1, 3, 5, 7, 9, 11, 13, 15, 17, 19)
+-------------------------------------------------------------------------------
+
+
 
 2) Write a function titled "factors" that takes a number and returns a list of its factors, other than 1 and the number itself. For example, +factors(15)+ should return +List(3, 5)+. 
 
@@ -13,6 +29,25 @@ Then write a new function that applies "factors" to a list of numbers. Try using
 
 *Answer*
 
+Here's the "factors" function.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def factors(x: Int) = { 2 to (x-1) filter (x % _ == 0) }
+factors: (x: Int)scala.collection.immutable.IndexedSeq[Int]
+-------------------------------------------------------------------------------
+
+We could use +map+ to map each item in the list to a new factor list and then +flatten+ the list of lists into a single list. Or just use +flatMap+ once.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def uniqueFactors(l: Seq[Int]) = l flatMap factors
+uniqueFactors: (l: Seq[Int])Seq[Int]
+
+scala> uniqueFactors(List(9, 11, 13, 15))
+res13: Seq[Int] = List(3, 3, 5)
+-------------------------------------------------------------------------------
+
 
 
 3) Write a function, +first[A](items: List[A], count: Int): List[A]+, that returns the first x number of items in a given list. For example, +first(List('a','t','o'), 2)+ should return +List('a','t')+. You could make this a one-liner by invoking one of the built-in list operations that already performs this task, or (preferably) implement your own solution. Can you do so with a for-loop? With +foldLeft+? With a recursive function that only accessed +head+ and +tail+?
@@ -20,13 +55,122 @@ Then write a new function that applies "factors" to a list of numbers. Try using
 
 *Answer*
 
+Although using a built-in list operation won't help you build out your Scala collection skills, it does let you solve the problem with a simple one-liner. And this is often the solution you will choose first while writing your own applications.
 
 
-4) Write a function that takes a list of strings and returns the longest string in the list. Can you avoid using mutable variables here? This is an excellent candidate for the list-folding operations (<<list_folding_operations_table>>) we studied. Can you implement this with both +fold+ and +reduce+ ? Would your function be more useful if it took a function parameter that compared two strings and returned the preferred one? How about if this function was applicable to generic lists, ie lists of any type?
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val chars = ('a' to 'f').toList
+chars: List[Char] = List(a, b, c, d, e, f)
+
+scala> def first[A](items: List[A], count: Int): List[A] = items take count
+first: [A](items: List[A], count: Int)List[A]
+
+scala> first(chars, 3)
+res0: List[Char] = List(a, b, c)
+-------------------------------------------------------------------------------
+
+Now that we have the easy solution working, let's try writing out our own solutions. Here's one that uses a for-loop.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def first[A](items: List[A], count: Int): List[A] = {
+     |   val l = for (i <- 0 until count) yield items(i)
+     |   l.toList
+     | }
+first: [A](items: List[A], count: Int)List[A]
+
+scala> first(chars, 3)
+res1: List[Char] = List(a, b, c)
+-------------------------------------------------------------------------------
+
+This works, but it's performance is going to be terrible with long non-indexed collections such as linked lists. 
+
+Here's a version using +foldLeft+, which then relies on +reverse+ to return the items in their original order. Starting with an empty list, this function adds each element in the input list to its accumulated list.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def first[A](items: List[A], count: Int): List[A] = {
+     |   items.foldLeft[List[A]](Nil) { (a: List[A], i: A) => 
+     |     if (a.size >= count) a else i :: a
+     |   }.reverse
+     | }
+first: [A](items: List[A], count: Int)List[A]
+
+scala> first(chars, 3)
+res2: List[Char] = List(a, b, c)
+-------------------------------------------------------------------------------
+
+Finally, let's solve this with an old-fashioned recursive function. Limited to accessing the +head+ and +tail+ components, this uses non-tail recursion to accumulate a list starting with the final recursive call.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def first[A](items: List[A], count: Int): List[A] = {
+     |   if (count > 0 && items.tail != Nil) items.head :: first(items.tail, count - 1)
+     |   else Nil
+     | }
+first: [A](items: List[A], count: Int)List[A]
+
+scala> first(chars, 3)
+res3: List[Char] = List(a, b, c)
+-------------------------------------------------------------------------------
+
+
+
+
+
+4) Write a function that takes a list of strings and returns the longest string in the list. Can you avoid using mutable variables here? This is an excellent candidate for the list-folding operations we studied. Can you implement this with both +fold+ and +reduce+ ? Would your function be more useful if it took a function parameter that compared two strings and returned the preferred one? How about if this function was applicable to generic lists, ie lists of any type?
 
 
 *Answer*
 
+Again, let's start with a short and simple implementation that takes advantage of the collections library.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def longest(l: List[String]): String = names.sortBy(0 - _.size).head
+longest: (l: List[String])String
+
+scala> val names = List("Harry", "Hermione", "Ron", "Snape")
+names: List[String] = List(Harry, Hermione, Ron, Snape)
+
+scala> longest(names)
+res0: String = Hermione
+-------------------------------------------------------------------------------
+
+Using +fold+ and +reduce+ is a natural fit for this function, as we're reducing a list down to one of its elements.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def longest(l: List[String]): String = {
+     |   names.fold("")((a,i) => if (a.size < i.size) i else a)
+     | }
+longest: (l: List[String])String
+
+scala> longest(names)
+res1: String = Hermione
+
+scala> def longest(l: List[String]): String = {
+     |   names.reduce((a,i) => if (a.size < i.size) i else a)
+     | }
+longest: (l: List[String])String
+
+scala> longest(names)
+res2: String = Hermione
+-------------------------------------------------------------------------------
+
+Now, if we're going to make this function applicable to any kind of list we will need a new way to compare elements. Here's a solution that takes a plain comparison function and uses it to reduce the list. We can invoke it with a function literal that returns the string with the longer size.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def greatest[A](l: List[A], max: (A,A) => A): A = {
+     |   l reduce ((a,i) => max(a,i))
+     | }
+greatest: [A](l: List[A], max: (A, A) => A)A
+
+scala> greatest[String](names, (x,y) => if (x.size > y.size) x else y)
+res3: String = Hermione
+-------------------------------------------------------------------------------
 
 
 5) Write a function that reverses a list. Can you write this as a recursive function? This may be a good place for a +match+ expression.
@@ -34,12 +178,61 @@ Then write a new function that applies "factors" to a list of numbers. Try using
 
 *Answer*
 
+We have already made use of "reverse" in answers to previous exercise questions, so it's a good idea to try and provide it ourselves. This version uses two list parameters, one of which gets initialized to +Nil+, to reverse the elements one at a time.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def reverse[A](src: List[A], dest: List[A] = Nil): List[A] = {
+     |   if (src == Nil) dest else reverse(src.tail, src.head :: dest)
+     | }
+reverse: [A](src: List[A], dest: List[A])List[A]
+
+scala> val names = List("Harry", "Hermione", "Ron", "Snape")
+names: List[String] = List(Harry, Hermione, Ron, Snape)
+
+scala> reverse(names)
+res0: List[String] = List(Snape, Ron, Hermione, Harry)
+-------------------------------------------------------------------------------
+
+
+
+
 
 
 6) Write a function that takes a +List[String]+ and returns a +(List[String],List[String])+, a tuple of string lists. The first list should be items in the original list that are palindromes (written the same forwards and backwards, like "racecar"). The second list in the tuple should be all of the remaining items from the original list. You can implement this easily with +partition+, but are there other operations you could use instead?
 
-
 *Answer*
+
+First, the easy way! Let's invoke +partition+ with a function that returns true if the string is a palindrome.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def splitPallies(l: List[String]) = l partition (s => s == s.reverse)
+splitPallies: (l: List[String])(List[String], List[String])
+
+scala> val pallies = List("Hi", "otto", "yo", "racecar")
+pallies: List[String] = List(Hi, otto, yo, racecar)
+
+scala> splitPallies(pallies)
+res0: (List[String], List[String]) = (List(otto, racecar),List(Hi, yo))
+-------------------------------------------------------------------------------
+
+If you think about it, +partition+ is a kind of list reduction function. It reduces a list to a single tuple, which happens to contain two lists. Let's use +foldLeft+ to reduce the list down to the tuple.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def splitPallies(l: List[String]) = {
+     |   l.foldLeft((List[String](),List[String]())) { (a, i) =>
+     |     if (i == i.reverse) (i :: a._1, a._2) else (a._1, i :: a._2)
+     |   }
+     | }
+splitPallies: (l: List[String])(List[String], List[String])
+
+scala> splitPallies(pallies)
+res0: (List[String], List[String]) = (List(racecar, otto),List(yo, Hi))
+-------------------------------------------------------------------------------
+
 
 
 
