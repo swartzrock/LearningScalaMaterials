@@ -24,6 +24,8 @@ Answers to exercises in the first four chapters are now available. The answers f
 
 * https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/ch5-FirstClassFunctions.asciidoc[Chapter 5 - First Class Functions] 
 
+* https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/ch6-CommonCollections.asciidoc[Chapter 6 - Common Collections] 
+
 
 
 == Errata
