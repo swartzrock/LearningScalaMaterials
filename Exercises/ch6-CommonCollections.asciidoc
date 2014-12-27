@@ -284,10 +284,145 @@ g) What are the high and low temperatures over the next 24 hours?
 h) What is the average temperature in this weather forecast? You can use the "value" attribute in the temperature element to calculate this value.
 
 
-
-
-
 *Answer*
+
+
+a) We'll load the url and verify the first 10 lines here.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val url = "http://api.openweathermap.org/data/2.5/forecast?mode=xml&lat=55&lon=0"
+url: String = http://api.openweathermap.org/data/2.5/forecast?mode=xml&lat=55&lon=0
+
+scala> val l: List[String] = io.Source.fromURL(url).getLines.toList
+l: List[String] = List(<?xml version="1.0" encoding="utf-8"?>, <weatherdata>, "  <location>", "    <name>Whitby</name>", "    <type/>", "    <country>GB</country>", "    <timezone/>", "    <location altitude="0" latitude="54.48774" longitude="-0.61498" geobase="geonames" geobaseid="0"/>", "  </location>", "  <credit/>", "  <meta>", "    <lastupdate/>", "    <calctime>1.067</calctime>", "    <nextupdate/>", "  </meta>", "  <sun rise="2014-12-26T08:24:05" set="2014-12-26T15:42:23"/>", "  <forecast>", "    <time from="2014-12-26T21:00:00" to="2014-12-27T00:00:00">", "      <symbol number="500" name="light rain" var="10n"/>", "      <precipitation value="0.5" unit="3h" type="rain"/>", "      <windDirection deg="175.502" code="S" name="South"/>", "      <windSpeed mps="4.46" name="Gentle Bre...
+
+scala> l take 10
+res0: List[String] = List(<?xml version="1.0" encoding="utf-8"?>, <weatherdata>, "  <location>", "    <name>Whitby</name>", "    <type/>", "    <country>GB</country>", "    <timezone/>", "    <location altitude="0" latitude="54.48774" longitude="-0.61498" geobase="geonames" geobaseid="0"/>", "  </location>", "  <credit/>")
+-------------------------------------------------------------------------------
+
+
+b) To make parsing easier, trim that white space from each line. Also, a function to retrieve the child text of a simple xml block makes the job easier.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val k = l map (_.trim)
+k: List[String] = List(<?xml version="1.0" encoding="utf-8"?>, ...
+
+scala> def getChild(tag: String) = k filter (_ contains s"<$tag>") mkString "" replaceAll(".*>(\\w+)</.*","$1")
+getChild: (tag: String)String
+
+scala> val cityName = getChild("name")
+cityName: String = Whitby
+
+scala> val countryCode = getChild("country")
+countryCode: String = GB
+-------------------------------------------------------------------------------
+
+c) Measuring the number of lines with the end segment "</time>" seems like a good way to do this.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val segments = l.filter(_ contains "</time>").size
+segments: Int = 41
+-------------------------------------------------------------------------------
+
+d) To get the weather description, we'll need to grab the "<symbol>" lines and retrieve the contents of the "name" field. I'm writing this as a reusable function because, yes, we'll be reusing it!
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def attribute(tag: String, attr: String) = {
+     |   k.filter(_ contains s"<$tag")
+     |     .filter(_ contains s"$attr=")
+     |     .map { s => s.replaceAll(s""".*$attr="([^"]+)".*""", "$1") }
+     | }
+attribute: (tag: String, attr: String)List[String]
+
+scala> val names = attribute("symbol", "name")
+names: List[String] = List(light rain, light rain, light rain, overcast clouds, ...
+-------------------------------------------------------------------------------
+
+Looking at the full weather feed, you can see that each time segment covers three hours. To do a 12-hour forecast all we need are the first four segments. Plus, it would be nice to include the start time of each period in the forecast.
+
+It's a good thing we have an "attribute" function. First, let's use it to retrieve a tuple of the time and description for the next 12 hours. Then we'll print it out with minor improvements to the time.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val forecast = attribute("time", "from") zip attribute("symbol", "name") take 4
+forecast: List[(String, String)] = List((2014-12-26T21:00:00,light rain), (2014-12-27T00:00:00,light rain), (2014-12-27T03:00:00,light rain), (2014-12-27T06:00:00,overcast clouds))
+
+scala> {
+     |   println("12 hour forecast")
+     |   forecast foreach { case (time, desc) => 
+     |     val when = time.replaceAll("""T(\d+).*""",""" at $100""")
+     |     println(s"$when | $desc")
+     |   }
+     | }
+12 hour forecast
+2014-12-26 at 2100 | light rain
+2014-12-27 at 0000 | light rain
+2014-12-27 at 0300 | light rain
+2014-12-27 at 0600 | overcast clouds
+-------------------------------------------------------------------------------
+
+Very nice, if I do say so myself.
+
+e) Easy enough with our "attribute" function.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val terms = attribute("symbol", "name").distinct.sorted
+terms: List[String] = List(broken clouds, few clouds, light rain, overcast clouds, scattered clouds, sky is clear)
+-------------------------------------------------------------------------------
+
+f) Let's make another list of tuples, and then turn them into a map. Fortunately there's a helper function called "toMap" which will build one from a list of 2-sized tuples.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val symbolsToDescriptions = attribute("symbol", "number") zip attribute("symbol", "name")
+symbolsToDescriptions: List[(String, String)] = List((500,light rain), (500,light rain), (500,light rain), (804,overcast clouds), (500,light rain), ...
+
+scala> val symMap = symbolsToDescriptions.distinct.map(t => t._1.toInt -> t._2).toMap
+symMap: scala.collection.immutable.Map[Int,String] = Map(500 -> light rain, 802 -> scattered clouds, 804 -> overcast clouds, 800 -> sky is clear, 801 -> few clouds, 803 -> broken clouds)
+
+scala> println("Light rain? Yup, " + symMap(500))
+Light rain? Yup, light rain
+-------------------------------------------------------------------------------
+
+g) The "max" and "min" functions for numeric lists are really helpful here.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val maxC = attribute("temperature", "max").map(_.toDouble).max
+maxC: Double = 7.743
+
+scala> val minC = attribute("temperature", "min").map(_.toDouble).min
+minC: Double = 3.042
+-------------------------------------------------------------------------------
+
+h) This time I'll use the "sum" function for numeric lists along with the handy "attribute" function.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val temps = attribute("temperature", "value").map(_.toDouble)
+temps: List[Double] = List(4.04, 3.96, 5.03, 5.61, 5.92, 5.5, 5.11, 4.93, 6.47, 6.8200000000001, 6.88, 6.51, 6.01, 7.22, 7.22, 6.4, 5.4, 5.06, 5.95, 6.37, 6.808, 7.42, 7.743, 7.701, 7.41, 6.236, 5.508, 5.34, 5.476, 6.644, 6.794, 6.043, 5.701, 5.199, 4.482, 3.755, 3.042, 4.897, 4.507, 3.824, 3.902)
+
+scala> val avgC = temps.sum / temps.size
+avgC: Double = 5.7278536585365885
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
