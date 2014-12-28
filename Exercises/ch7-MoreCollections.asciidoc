@@ -1,0 +1,651 @@
+
+1) The Fibonacci series starts with the numbers "1, 1" and then computes each successive element as the sum of the previous two elements. We'll use this series to get familiarized with the collections in this chapter.
+
+a) Write a function that returns a list of the first x elements in the  Fibonacci series Can you write this with a +Buffer+? Would a +Builder+ be appropriate here? 
+
+b) Write a new Fibonacci function that adds new Fibonacci numbers to an existing list of numbers. It should take a list of numbers (+List[Int]+) and the count of new elements to add and return a new list (+List[Int]+). While the input list and returned lists are immutable, you should be able to use a mutable list inside your function. Can you also write this function using only immutable lists? Which version, using mutable vs immutable collections, is more appropriate and readable?
+
+c) The +Stream+ collection is a great solution for creating a Fibonacci series. Create a stream that will generate a Fibonacci series. Use it to print out the first 100 elements in the series, in a formatted report of 10 comma-delimited elements per line.
+
+d) Write a function that takes an element in the Fibonacci series and returns the following element in the series. For example, +fibNext(8)+ should return +13+. How will you handle invalid input such as +fixNext(9)+ ? What are your options for conveying the lack of a return value to callers?
+
+*Answer*
+
+
+
+a) A +Buffer+ is a great way to write this fibonacci sequence generator. We can use a list to start the sequence with "1, 1" and then convert it to a buffer for adding additional elements. 
+
+Computing the current element in the sequence is a matter of adding up the previous two elements. The +takeRight+ function will give us a list of the final two elements which we can then sum and add to the buffer.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def fib(count: Int): List[Int] = {
+     |   val b = List(1, 1).toBuffer
+     |   while(b.size < count) b += b.takeRight(2).sum
+     |   b.toList
+     | }
+fib: (count: Int)List[Int]
+
+scala> val fibonaccis = fib(12)
+fibonaccis: List[Int] = List(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144)
+-------------------------------------------------------------------------------
+
+A +Builder+ could be used here, but we would lose the ability to easily access the size and elements from the collection in progress. The previous two elements would be better tracked as local variables, or as parameters to a recursive function. 
+
+
+b) With minor modifications, the "fib()" function above can take a starting fibonacci list and add new items.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def fibAdd(l: List[Int], count: Int): List[Int] = {
+     |   val b = l.toBuffer
+     |   for (i <- 1 to count) b += b.takeRight(2).sum
+     |   b.toList
+     | }
+fibAdd: (l: List[Int], count: Int)List[Int]
+
+scala> val more = fibAdd(List(1, 1, 2, 3), 10)
+more: List[Int] = List(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377)
+-------------------------------------------------------------------------------
+
+Using immutable collections means we'll need a different strategy. A recursive function could solve this problem, one which appends the next element and decrements the count before invoking itself. 
+
+Here's a tail-recursive implementation, including the "tailrec" annotation so the Scala compiler will validate this claim.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> @annotation.tailrec
+     | def fibAdd(l: List[Int], count: Int): List[Int] = {
+     |   if (count < 1) l
+     |   else {
+     |     val k = l :+ l.takeRight(2).sum
+     |     fibAdd(k, count - 1)
+     |   }
+     | }
+fibAdd: (l: List[Int], count: Int)List[Int]
+
+scala> val more = fibAdd2(List(1, 1, 2, 3), 10)
+more: List[Int] = List(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377)
+-------------------------------------------------------------------------------
+
+
+c) We can use a recursive function to define our stream, but instead of using +takeRight(2)+ we will need to track those two preceeding elements using function parameters. 
+
+The key to implementing streams with recursive functions is to recall that the recursive function itself creates the stream, with each recursive call adding a new element.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def fib(a: Int, b: Int): Stream[Int] = a #:: fib(b, a + b)
+fib: (a: Int, b: Int)Stream[Int]
+
+scala> val fibonaccis = fib(1, 1).take(100).toList
+fibonaccis: List[Int] = List(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887, 9227465, 14930352, 24157817, 39088169, 63245986, 102334155, 165580141, 267914296, 433494437, 701408733, 1134903170, 1836311903, -1323752223,...
+-------------------------------------------------------------------------------
+
+As you can see, 4-byte integers are insufficient, as you quickly ascend into the negative integer range. We'll need an 8-byte integer version of this stream in order to calculate all 100 numbers.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def fib(a: Long, b: Long): Stream[Long] = a #:: fib(b, a + b)
+fib: (a: Long, b: Long)Stream[Long]
+
+scala> val fibonaccis = fib(1, 1).take(100).toList
+fibonaccis: List[Long] = List(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, ...
+
+scala> val report = fibonaccis grouped 10 map (_.mkString(","))
+report: Iterator[String] = non-empty iterator
+
+scala> report foreach println
+1,1,2,3,5,8,13,21,34,55
+89,144,233,377,610,987,1597,2584,4181,6765
+10946,17711,28657,46368,75025,121393,196418,317811,514229,832040
+1346269,2178309,3524578,5702887,9227465,14930352,24157817,39088169,63245986,102334155
+165580141,267914296,433494437,701408733,1134903170,1836311903,2971215073,4807526976,7778742049,12586269025
+20365011074,32951280099,53316291173,86267571272,139583862445,225851433717,365435296162,591286729879,956722026041,1548008755920
+-------------------------------------------------------------------------------
+
+
+d) An element of the fibonacci sequences requires the two previous elements for computation. If you only the previous element to work with, then you'll need either a precomputed sequence or a function to generate the values up to the given element.
+
+In this version I'll use the +Stream.takeWhile+ operation to generate entries until the requested value has been reached. Since the given element may or may not be valid, I'll use an +Option[Long]+ to indicate whether the next value was computable.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def fib(a: Long, b: Long): Stream[Long] = a #:: fib(b, a + b)
+fib: (a: Long, b: Long)Stream[Long]
+
+scala> def nextFib(i: Int): Option[Long] = {
+     |   val start = fib(1, 1)
+     |   val preceeding = start.takeWhile(_ <= i).toList
+     |   if (preceeding.last == i) Some(preceeding.takeRight(2).sum)
+     |   else None
+     | }
+nextFib: (i: Int)Option[Long]
+
+scala> val x = nextFib(21)
+x: Option[Long] = Some(34)
+
+scala> val y = nextFib(22)
+y: Option[Long] = None
+-------------------------------------------------------------------------------
+
+
+
+
+
+2) In the example for +Array+ collections we used the +java.io.File(<path>).listFiles+ operation to return an array of files in the current directory. Write a function that does the same thing for a directory, and converts each entry into its +String+ representation using the +toString+ method. Filter out any dot-files (files which begin with the character '.') and print the rest of the files separated by a semi-colon (';'). Test this out in a directory on your computer that has a significant number of files.
+
+*Answer*
+
+We'll start with a function that returns a list of the names of files in the given directory (cleansed of the "./" prefix). Then we'll filter out the dot files and print the rest as a semicolon-delimited string.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def listFiles(path: String): List[String] = {
+     |   val files = new java.io.File(path).listFiles.toList
+     |   files.map( _.toString.replaceFirst("./","") )
+     | }
+listFiles: (path: String)List[String]
+
+scala> val files = listFiles(".")
+files: List[String] = List(.DS_Store, .git, .gitignore, .idea, .idea_modules, akka, atmosphere, auth, commands, common, CONTRIBUTING.markdown, core, CREDITS.md, crosspaths.sbt, example, fileupload, jetty, json, LICENSE, notes, project, publishing.sbt, README.markdown, sbt, scalate, scalatest, slf4j, specs2, spring, swagger, swagger-ext, target, test, version.sbt)
+
+scala> val files = listFiles(".").filterNot(_ startsWith ".")
+files: List[String] = List(akka, atmosphere, auth, commands, common, CONTRIBUTING.markdown, core, CREDITS.md, crosspaths.sbt, example, fileupload, jetty, json, LICENSE, notes, project, publishing.sbt, README.markdown, sbt, scalate, scalatest, slf4j, specs2, spring, swagger, swagger-ext, target, test, version.sbt)
+
+scala> println("Found these files: " + files.mkString(";") )
+Found these files: akka;atmosphere;auth;commands;common;CONTRIBUTING.markdown;core;CREDITS.md;crosspaths.sbt;example;fileupload;jetty;json;LICENSE;notes;project;publishing.sbt;README.markdown;sbt;scalate;scalatest;slf4j;specs2;spring;swagger;swagger-ext;target;test;version.sbt
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+3) Take the file listing from exercise 3 and print a report showing each letter in the alphabet followed by the number of files that start with that letter.
+
+*Answer*
+
+Note - this should have said "exercise 2", not "exercise 3". Although this exercise can be done by manually counting entries, it's a lot shorter if you let the collection operations do most of the work for you.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> val files = listFiles(".").filterNot(_ startsWith ".")
+files: List[String] = List(akka, atmosphere, auth, commands, common, CONTRIBUTING.markdown, core, CREDITS.md, crosspaths.sbt, example, fileupload, jetty, json, LICENSE, notes, project, publishing.sbt, README.markdown, sbt, scalate, scalatest, slf4j, specs2, spring, swagger, swagger-ext, target, test, version.sbt)
+
+scala> val fileLookup = files.groupBy(_.head.toLower).toList.sortBy(_._1)
+fileLookup: List[(Char, List[String])] = List((a,List(akka, atmosphere, auth)), (c,List(commands, common, CONTRIBUTING.markdown, core, CREDITS.md, crosspaths.sbt)), (e,List(example)), (f,List(fileupload)), (j,List(jetty, json)), (l,List(LICENSE)), (n,List(notes)), (p,List(project, publishing.sbt)), (r,List(README.markdown)), (s,List(sbt, scalate, scalatest, slf4j, specs2, spring, swagger, swagger-ext)), (t,List(target, test)), (v,List(version.sbt)))
+
+scala> for { (c,l) <- fileLookup } { println(s"'$c' has ${l.size} files") }
+'a' has 3 files
+'c' has 6 files
+'e' has 1 files
+'f' has 1 files
+...
+-------------------------------------------------------------------------------
+
+
+4) Write a function to return the product of two numbers.. that are each specified as a +String+, not a numeric type. Will you support both integers and floating-point numbers? How will you convey if either or both of the inputs are invalid? Can you handle the converted numbers using a +match+ expression? How about with a for-loop?
+
+*Answer*
+
+The two number parameters are strings, and so will need to be normalized into numeric values if possible. To start, I'll write a function that will parse the strings into doubles but wrapped with an +Option+ to denote the presence or absence of a value.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def toDouble(a: String) = util.Try(a.toDouble).toOption
+toDouble: (a: String)Option[Double]
+
+scala> val x = toDouble("a")
+x: Option[Double] = None
+-------------------------------------------------------------------------------
+
+Now that we have a function to handle parsing the input strings, our "product" function can focus on handling the case when both parameters are valid. In this function, the match expression ensures that the product will only be returned when both numbers are present. 
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def product(a: String, b: String): Option[Double] = {
+     |   (toDouble(a), toDouble(b)) match {
+     |     case (Some(a1), Some(b1)) => Some(a1 * b1)
+     |     case _ => None
+     |   }
+     | }
+product: (a: String, b: String)Option[Double]
+
+scala> val x = product("yes", "20")
+x: Option[Double] = None
+
+scala> val x = product("99.3", "7")
+x: Option[Double] = Some(695.1)
+-------------------------------------------------------------------------------
+
+
+Using a for-loop with two options is even more concise than a match expression, as the +None+ type is automatically returned in case the loop exits early.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def product(a: String, b: String): Option[Double] = {
+     |   for (a1 <- toDouble(a); b1 <- toDouble(b)) yield a1 * b1
+     | }
+product: (a: String, b: String)Option[Double]
+
+scala> val x = product("11", "1.93")
+x: Option[Double] = Some(21.23)
+
+scala> val x = product("true", "")
+x: Option[Double] = None
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+5) Write a function to safely wrap calls to the JVM library method +System.getProperty(<String>)+, avoiding raised exceptions or null results. +System.getProperty(<String>)+ returns a JVM environment property value given the property's name. For example, +System.getProperty("java.home")+ will return the path to the currently running Java instance while +System.getProperty("user.timezone")+ returns the time zone property from the operating system. This method can be dangerous to use, however, since it may throw exceptions or return +null+ for invalid inputs. Try invoking +System.getProperty("")+ or +System.getProperty("blah")+ from the Scala REPL to see how it responds.
+
+Experienced Scala developers build their own libraries of functions that wrap unsafe code with Scala's monadic collections. Your function should simply pass its input to the method and ensure that exceptions and null values are safely handled and filtered. Call your function with the example property names above, including the valid and invalid ones, to verify that it never raises exceptions or returns null results. 
+
+*Answer*
+
+Let's try out the problem see if we can get back an exception or null value.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> System.getProperty(null)
+java.lang.NullPointerException: key can't be null
+  at java.lang.System.checkKey(System.java:829)
+  at java.lang.System.getProperty(System.java:705)
+  ... 32 elided
+
+scala> val arch = System.getProperty("os.arch")
+arch: String = x86_64
+
+scala> val blarg = System.getProperty("blarg")
+blarg: String = null
+
+-------------------------------------------------------------------------------
+
+
+Wrapping the call in a +util.Try+ and then handling the potential null result with +Option+ makes it possible to safely deal with the null results or exceptions. 
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def getProperty(s: String): Option[String] = {
+     |   util.Try( System.getProperty(s) ) match {
+     |     case util.Success(x) => Option(x)
+     |     case util.Failure(ex) => None
+     |   }
+     | }
+getProperty: (s: String)Option[String]
+
+scala> getProperty(null)
+res1: Option[String] = None
+
+scala> val arch = getProperty("os.arch")
+arch: Option[String] = Some(x86_64)
+
+scala> val blarg = getProperty("blarg")
+blarg: Option[String] = None
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+6) Write a function that reports recent Github commits for a project. Github provides an RSS feed of recent commits for a given user, repository and branch, containing xml that you can parse out with regular expressions. Your function should take the user, repository and branch, read and parse the RSS feed, and then print out the commit information. This should include the date, title and author of each commit.
+
+You can use the following RSS url to retrieve recent commits for a given repository and branch:
+
+-------------------------------------------------------------------------------
+https://github.com/<user name>/<repo name>/commits/<branch name>.atom
+-------------------------------------------------------------------------------
+
+Here is one way to grab the RSS feed as a single string.
+
+-------------------------------------------------------------------------------
+scala> val u = "https://github.com/scala/scala/commits/2.11.x.atom"
+u: String = https://github.com/scala/scala/commits/2.11.x.atom
+
+scala> val s = io.Source.fromURL(u)
+s: scala.io.BufferedSource = non-empty iterator
+
+scala> val text = s.getLines.map(_.trim).mkString("")
+text: String = <?xml version="1.0" encoding="UTF-8"?><feed xmlns=...
+-------------------------------------------------------------------------------
+
+Working with the xml will be a bit tricky. You may want to use +text.split(<token>) to split the text into the separate <entry> components, and then use regular expression capture groups (see <<regular_expressions_section>>) to parse out the <title> and other elements. You could also just try iterating through all the lines of the xml file, adding elements to a buffer as you find them, and then converting that to a new list.
+
+Once you have completed this exercise (and there is a lot to do here), here are some additional features worth investigating.
+a) Move the user, repo and branch parameters into a tuple parameter.
+b) Following exercise "a", have the function take a list of Github projects and print a report of each one's commits, in order of specified project.
+c) Following exercise "b", retrieve all of the projects commit data concurrently using futures, await the result (no more than 5 seconds), and then print a commit report for each project, in order of project specified.
+d) Following exercise "c", mix the commits together and sort by commit date, then print your report with an additional "repo" column.
+
+These additional features will take some time to implement, but are definitely worthwhile for learning and improving your Scala development skills.
+
+Once you have finished these features, test out your commit report using entries from the following projects.
+
+-------------------------------------------------------------------------------
+https://github.com/akka/akka/tree/master
+https://github.com/scala/scala/tree/2.11.x
+https://github.com/sbt/sbt/tree/0.13
+https://github.com/scalaz/scalaz/tree/series/7.2.x
+-------------------------------------------------------------------------------
+
+These features are all active (as of 2014), so you should see an interesting mix of commit activity in your report. Its worthwhile to browse the repositories for these core open source Scala projects, or at least their documentation, to understand some of the excellent work being done.
+
+
+*Answer*
+
+There's a lot to get done here. Writing some useful (and reusable) functions is a good way to start. Here's one which returns the Github RSS feed giving a user name, repository and branch.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def githubRss(user: String, repo: String, branch: String): String = {
+     |   val url = s"https://github.com/$user/$repo/commits/$branch.atom"
+     |   val lines = io.Source.fromURL(url).getLines.toList
+     |   val xml = lines.map(_.trim).mkString("")
+     |   xml
+     | }
+githubRss: (user: String, repo: String, branch: String)String
+
+scala> val xml = githubRss("slick", "slick", "master")
+xml: String = <?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3....
+-------------------------------------------------------------------------------
+
+We need to be able to work with the individual "<entry>" elements in this xml feed. Here's a function to extract out these elements.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def xmlToEntryList(xml: String) = xml.split("</?entry>").filterNot(_.isEmpty).tail
+xmlToEntryList: (xml: String)Array[String]
+
+scala> val entries = xmlToEntryList(xml); println(s"Got ${entries.size} entries")
+Got 21 entries
+entries: Array[String] = Array(<id>tag:github.com,2008:Grit::Commit/3e734c4583d0...
+-------------------------------------------------------------------------------
+
+Now that we have an list (well, an +Array+ to be specific) containing the "<entry>" elements, we need to be able to extract child text from specific elements. In previous chapters we have used regular expressions to parse this, but now that we know about monadic collection it would be prudent to use them here. Here's a function that will safely extract the text without the possibility of triggering a match exception.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def child(xml: String, name: String): Option[String] = {
+     |   val p = s".*<$name>(.*)</$name>.*".r
+     |   xml match {
+     |     case p(result) => Option(result)
+     |     case _ => None
+     |   }
+     | }
+child: (xml: String, name: String)Option[String]
+
+scala> val firstTitle = child(entries(0), "title")
+firstTitle: Option[String] = Some(Merge pull request #1033 from slick/tmp/release-3.0.0-m1)
+-------------------------------------------------------------------------------
+
+The last utility function we'll need is one that takes this "<entry>" element and returns a formatted report, including the entry's date, title and author. As our "child" function returns an option, our "report" function will need to handle the possibility that the required data is not present. Here's the function, which returns a formatted string if all three elements were extracted or else None if any items were missing.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def report(entryXml: String): Option[String] = {
+     |   for { 
+     |     title <- child(entryXml, "title")
+     |     date <- child(entryXml, "updated").map(_.replaceAll("T.*",""))
+     |     author <- child(entryXml, "name")
+     |   }
+     |   yield s"title:  $title\ndate:   $date\nauthor: $author"
+     | }
+report: (entryXml: String)Option[String]
+
+scala> val firstReport = report(entries(0))
+firstReport: Option[String] =
+Some(title:  Merge pull request #1033 from slick/tmp/release-3.0.0-m1
+date:   2014-12-19
+author: szeiger)
+-------------------------------------------------------------------------------
+
+With all of these clean, short, and pure functions available, the actual activity report function won't need to do very much. Here's the final github report function, which parses the xml, splits up the entries, formats them (keeping only the good ones), and returns the result as a printable report.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def getGithubReport(user: String, repo: String, branch: String): String = {
+     |   val xml = githubRss(user, repo, branch)
+     |   val entries = xmlToEntryList(xml).toList
+     |   val formattedEntries = entries flatMap report
+     |   val title = s"Github commit activity for $repo:$branch"
+     |   title :: formattedEntries mkString ("\n" + "=" * 80 + "\n")
+     | }
+getGithubReport: (user: String, repo: String, branch: String)String
+
+scala> val slickReport = getGithubReport("slick", "slick", "master")
+slickReport: String =
+Github commit activity for slick:master
+================================================================================
+title:  Merge pull request #1033 from slick/tmp/release-3.0.0-m1
+date:   2014-12-19
+author: szeiger
+================================================================================
+title:  Bump version numbers:
+date:   2014-12-19
+author: szeiger
+================================================================================
+title:  Merge pull request #1021 from slick/tmp/action-monad
+date:   2014-12-19
+author: szeiger
+================================================================================
+title:  Add concurrency stress test for streaming API:
+date:   2014-12-19
+author: szeiger
+...
+-------------------------------------------------------------------------------
+
+
+
+==== Additional Features
+
+a) Using a tuple instead of individual parameters:
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def getGithubReport(urb: (String,String,String)): String = {
+     |   val xml = githubRss(urb._1, urb._2, urb._3)
+     |   val entries = xmlToEntryList(xml).toList
+     |   val formattedEntries = entries flatMap report
+     |   val title = s"Github commit activity for ${urb._2}:${urb._3}"
+     |   title :: formattedEntries mkString ("\n" + "=" * 80 + "\n")
+     | }
+getGithubReport: (urb: (String, String, String))String
+-------------------------------------------------------------------------------
+
+
+b) A new function that can convert a list of user-repo-branch tuples into reports should be easy to write. 
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def getGithubReports(urbs: List[(String,String,String)]) = urbs map getGithubReport
+getGithubReports: (urbs: List[(String, String, String)])List[String]
+
+scala> val slickUrb = ("slick","slick","master")
+slickUrb: (String, String, String) = (slick,slick,master)
+
+scala> val akkaUrb = ("akka","akka","master")
+akkaUrb: (String, String, String) = (akka,akka,master)
+
+scala> val scalaUrb = ("scala","scala","2.11.x")
+scalaUrb: (String, String, String) = (scala,scala,2.11.x)
+
+scala> val scalazUrb = ("scalaz","scalaz","series/7.2.x")
+scalazUrb: (String, String, String) = (scalaz,scalaz,series/7.2.x)
+
+scala> println( getGithubReports(List(akkaUrb,slickUrb)) )
+List(Github commit activity for akka:master
+================================================================================
+title:  Merge pull request #16530 from skrauchenia/fix/16330-akka-util-Crypt-deprecate-skrauchenia
+date:   2014-12-20
+author: rkuhn
+================================================================================
+title:  =act, ker, rem, doc #16330 deprecate akka.util.Crypt
+date:   2014-12-20
+author: skrauchenia
+...
+-------------------------------------------------------------------------------
+
+
+There's one problem here, however - we don't have enough information in each commit to differentiate them by project. Let's rewrite the "getGithubReport" into a new function that will give us the branch information for each commit. Instead of a single string, it should return this as a list of individual commit reports so we can combine them as necessary.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def getGithubCommitReports(urb: (String,String,String)): List[String] = {
+     |   val xml = githubRss(urb._1, urb._2, urb._3)
+     |   val entries = xmlToEntryList(xml).toList
+     |   val branchInfo = s"branch: ${urb._2}:${urb._3}\n"
+     |   entries flatMap report map (branchInfo + _)
+     | }
+getGithubCommitReports: (urb: (String, String, String))List[String]
+-------------------------------------------------------------------------------
+
+Here's a new version of "getGithubReports" that invokes this rewritten function.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def getGithubReports(urbs: List[(String,String,String)]) = {
+     |   val commits = urbs flatMap getGithubCommitReports
+     |   val separator = "\n" + "="*60 + "\n"
+     |   val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
+     |   title :: commits mkString separator
+     | }
+getGithubReports: (urbs: List[(String, String, String)])String
+
+scala> println( getGithubReports(List(akkaUrb,slickUrb)) )
+Github activity for akka, slick repos
+============================================================
+branch: akka:master
+title:  Merge pull request #16530 from skrauchenia/fix/16330-akka-util-Crypt-deprecate-skrauchenia
+date:   2014-12-20
+author: rkuhn
+...
+-------------------------------------------------------------------------------
+
+
+c) We'll need yet another version of "getGithubReports", this time with futures.
+
+[source,scala]
+-------------------------------------------------------------------------------
+def getGithubReports(urbs: List[(String,String,String)]) = {
+  val commits = urbs flatMap getGithubCommitReports
+  val separator = "\n" + "="*60 + "\n"
+  val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
+  title :: commits mkString separator
+}
+
+
+-------------------------------------------------------------------------------
+
+
+
+
+
+def getGithubReports(urbs: List[(String,String,String)]) = {
+  val commits = urbs flatMap getGithubCommitReports
+  val separator = "\n" + "="*60 + "\n"
+  val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
+  title :: commits mkString separator
+}
+
+
+
+
+
+
+Let's update the "report" function and also print out the user, repo and branch information.
+
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def getGithubReport(urb: (String,String,String)): String = {
+     |   val xml = githubRss(urb._1, urb._2, urb._3)
+     |   val entries = xmlToEntryList(xml).toList
+     |   val branchInfo = s"branch:  ${urb._2}:${urb._3}\n"
+     |   val formattedEntries = entries flatMap report map (branchInfo + _)
+     |   val title = s"Github commit activity for ${urb._2}:${urb._3}"
+     |   title :: formattedEntries mkString ("\n" + "=" * 80 + "\n")
+     | }
+getGithubReport: (urb: (String, String, String))String
+-------------------------------------------------------------------------------
+
+
+
+
+
+def getGithubReports(urbs: List[(String,String,String)]) = urbs map getGithubReport
+
+
+
+
+def getGithubReport(user: String, repo: String, branch: String): String = {
+  val xml = githubRss(user, repo, branch)
+  val entries = xmlToEntryList(xml).toList
+  val formattedEntries = entries flatMap report
+  val title = s"Github commit activity for $repo:$branch"
+  title :: formattedEntries mkString ("\n" + "=" * 80 + "\n")
+}
+
+
+
+
+
+
+7) Write a command-line script to call your Github commit report function above and print out the results. This will require a Unix shell; if you are on a Windows system you will need a compatible Unix environment such as Cygwin or Virtualbox (running a Unix virtual machine). You'll also need to install SBT (Simple Build Tool), a build tool that supports dependency management and plugins and is commonly used by Scala projects. You can download SBT from http://www.scala-sbt.org/ for any environment, including a .MSI windows installer version. SBT is also available from popular package managers. If you are using Homebrew on OS X you can install it with "brew install sbt".
+
+.Isn't SBT Hard To Learn?
+[NOTE]
+====
+Maybe. In this exercise we'll only use it as a shell script launcher, so you can get comfortable with writing and executing shell scripts in Scala. We'll cover how to write SBT built scripts to manage your own projects in later chapters.
+====
+
+Here is an example SBT-based Scala script which reads the command line arguments as a +List+ and prints a greeting. The comment block starting with triple asterisks is reserved for SBT settings. In this script we are specifying that we want version 2.11.1 of the Scala language to be used.
+
+-------------------------------------------------------------------------------
+#!/usr/bin/env sbt -Dsbt.main.class=sbt.ScriptMain
+
+/***
+scalaVersion := "2.11.1"
+*/
+
+def greet(name: String): String = s"Hello, $name!"
+
+
+// Entry point for our script
+args.toList match {
+  case List(name) => {
+    val greeting = greet(name)
+    println(greeting)
+  }
+  case _ =>
+    println("usage: HelloScript.scala <name>")
+} 
+-------------------------------------------------------------------------------
+
+Copy this into a file titled "HelloScript.scala", and change the permissions to be executable ("chmod a+x HelloScript.scala" in a Unix environment). Then you can run the script directly:
+
+-------------------------------------------------------------------------------
+$ ./HelloScript.scala Jason
+[info] Set current project to root-4926629s8acd7bce0b (in 
+  build file:/Users/jason/.sbt/boot/4926629s8acd7bce0b/)
+Hello, Jason!
+-------------------------------------------------------------------------------
+
+Your commit report script will need to take multiple Github projects as arguments. To keep the arguments concise you may want to combine each project's input into a single string to be parsed, such as "scala/scala/2.11.x". 
+
+The printout should be clean, well-formatted and easily readable. Using fixed column widths could help, using the printf-style formatting codes in string interpolation. 
+
+
+
+*Answer*
+
+
