@@ -1,0 +1,16 @@
+
+
+== Errata
+
+
+=== Chapter 7 - More Collections
+
+==== Exercises
+
+3. Take the file listing from exercise 3 and print a report showing each letter in the alphabet followed by the number of files that start with that letter.
+
+
+> This should be "the file listing from exercise 2", which is the previous exercise.
+
+
+
