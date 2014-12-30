@@ -26,6 +26,8 @@ Answers to exercises in the first four chapters are now available. The answers f
 
 * https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/ch6-CommonCollections.asciidoc[Chapter 6 - Common Collections] 
 
+* https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/ch7-MoreCollections.asciidoc[Chapter 7 - More Collections] 
+
 
 
 == Errata
