@@ -510,11 +510,11 @@ scala> def getGithubCommitReports(urb: (String,String,String)): List[String] = {
 getGithubCommitReports: (urb: (String, String, String))List[String]
 -------------------------------------------------------------------------------
 
-Here's a new version of "getGithubReports" that invokes this rewritten function.
+Here's a new version of "getGithubReports" that invokes "getGithubCommitReports".
 
 [source,scala]
 -------------------------------------------------------------------------------
-scala> def getGithubReports(urbs: List[(String,String,String)]) = {
+scala> def getGithubReports(urbs: List[(String,String,String)]): String = {
      |   val commits = urbs flatMap getGithubCommitReports
      |   val separator = "\n" + "="*60 + "\n"
      |   val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
@@ -533,69 +533,92 @@ author: rkuhn
 -------------------------------------------------------------------------------
 
 
-c) We'll need yet another version of "getGithubReports", this time with futures.
+
+c) Until now we have been loading Github's RSS content synchronously, blocking the current thread of execution until the entire document(s) could be read. While suitable in an exercise solution, this method lacks the stability and performance one would expect in a production application.
+
+Let's rewrite the "getGithubReports" function (again!) to fix this. This new version will load all of the RSS content asynchronously, parsing and reporting them as they come in. As each report comes in, we'll add the list of commits to a local builder, and then after a set period return a report of the commits collected so far.
+
 
 [source,scala]
 -------------------------------------------------------------------------------
-def getGithubReports(urbs: List[(String,String,String)]) = {
-  val commits = urbs flatMap getGithubCommitReports
-  val separator = "\n" + "="*60 + "\n"
-  val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
-  title :: commits mkString separator
-}
-
-
--------------------------------------------------------------------------------
-
-
-
-
-
-def getGithubReports(urbs: List[(String,String,String)]) = {
-  val commits = urbs flatMap getGithubCommitReports
-  val separator = "\n" + "="*60 + "\n"
-  val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
-  title :: commits mkString separator
-}
-
-
-
-
-
-
-Let's update the "report" function and also print out the user, repo and branch information.
-
-[source,scala]
--------------------------------------------------------------------------------
-scala> def getGithubReport(urb: (String,String,String)): String = {
-     |   val xml = githubRss(urb._1, urb._2, urb._3)
-     |   val entries = xmlToEntryList(xml).toList
-     |   val branchInfo = s"branch:  ${urb._2}:${urb._3}\n"
-     |   val formattedEntries = entries flatMap report map (branchInfo + _)
-     |   val title = s"Github commit activity for ${urb._2}:${urb._3}"
-     |   title :: formattedEntries mkString ("\n" + "=" * 80 + "\n")
+scala> def getGithubReports(urbs: List[(String,String,String)]): String = {
+     |   val commits = List.newBuilder[String]
+     | 
+     |   import concurrent.ExecutionContext.Implicits.global
+     |   val futures = urbs map { urb =>
+     |     concurrent.Future { commits ++= getGithubCommitReports(urb) }
+     |   }
+     |   val future = concurrent.Future.sequence(futures)
+     | 
+     |   import concurrent.duration._
+     |   concurrent.Await.result(future, Duration(5, SECONDS))
+     | 
+     |   val separator = "\n" + "="*60 + "\n"
+     |   val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
+     |   (title :: commits.result) mkString separator
      | }
-getGithubReport: (urb: (String, String, String))String
+getGithubReports: (urbs: List[(String, String, String)])String
 -------------------------------------------------------------------------------
 
 
+The +Future.sequence+ operation converts a list of futures into a future of lists. We can then block the current thread for up to five seconds, waiting for all of the simultaneous futures to complete, before compiling the commits into a single report.
 
 
 
-def getGithubReports(urbs: List[(String,String,String)]) = urbs map getGithubReport
+d) This time the commits from each of the finished repo feeds will need to be intermingled and sorted by most recent commit first. The challenge here is how to order a list of these multi-line commit messages. Doing a replace all with the "(?s)" flag to indicate that newlines may be included in expressions will help to trim each commit down to its numeric date field.
 
 
+[source,scala]
+-------------------------------------------------------------------------------
+scala> def getGithubReports(urbs: List[(String,String,String)]): String = {
+     |   val commits = List.newBuilder[String]
+     | 
+     |   import concurrent.ExecutionContext.Implicits.global
+     |   val futures = urbs map { urb =>
+     |     concurrent.Future { commits ++= getGithubCommitReports(urb) }
+     |   }
+     |   val future = concurrent.Future.sequence(futures)
+     | 
+     |   import concurrent.duration._
+     |   concurrent.Await.result(future, Duration(5, SECONDS))
+     | 
+     |   val separator = "\n" + "="*60 + "\n"
+     |   val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
+     |   
+     |   val sortedCommits = commits.result.sortBy { c =>
+     |     c.replaceAll("(?s).*date:   ","").replaceAll("(?s)\\s.*","")
+     |   }.reverse
+     | 
+     |   (title :: sortedCommits) mkString separator
+     | }
+getGithubReports: (urbs: List[(String, String, String)])String
 
+scala> 
 
-def getGithubReport(user: String, repo: String, branch: String): String = {
-  val xml = githubRss(user, repo, branch)
-  val entries = xmlToEntryList(xml).toList
-  val formattedEntries = entries flatMap report
-  val title = s"Github commit activity for $repo:$branch"
-  title :: formattedEntries mkString ("\n" + "=" * 80 + "\n")
-}
-
-
+scala> println( getGithubReports(List(akkaUrb,slickUrb)) )
+Github activity for akka, slick repos
+============================================================
+branch: akka:master
+title:  =act, ker, rem, doc #16330 deprecate akka.util.Crypt
+date:   2014-12-20
+author: skrauchenia
+============================================================
+branch: akka:master
+title:  Merge pull request #16530 from skrauchenia/fix/16330-akka-util-Crypt-deprecate-skrauchenia
+date:   2014-12-20
+author: rkuhn
+============================================================
+branch: slick:master
+title:  Add concurrency stress test for streaming API:
+date:   2014-12-19
+author: szeiger
+============================================================
+branch: slick:master
+title:  Merge pull request #1021 from slick/tmp/action-monad
+date:   2014-12-19
+author: szeiger
+...
+-------------------------------------------------------------------------------
 
 
 
@@ -647,5 +670,136 @@ The printout should be clean, well-formatted and easily readable. Using fixed co
 
 
 *Answer*
+
+
+This final question is less about figuring out complex solutions to problems and more about organizing all of the functions you have written into a single executable shell script.
+
+My solution is here, using pretty much the same functions as used above. I entered this in a file called "GithubCommits.scala".
+
+[source,scala]
+-------------------------------------------------------------------------------
+#!/usr/bin/env sbt -Dsbt.main.class=sbt.ScriptMain
+
+/***
+scalaVersion := "2.11.1"
+*/
+
+
+def githubRss(user: String, repo: String, branch: String): String = {
+  val url = s"https://github.com/$user/$repo/commits/$branch.atom"
+  val lines = io.Source.fromURL(url).getLines.toList
+  val xml = lines.map(_.trim).mkString("")
+  xml
+}
+
+def child(xml: String, name: String): Option[String] = {
+  val p = s".*<$name>(.*)</$name>.*".r
+  xml match {
+    case p(result) => Option(result)
+    case _ => None
+  }
+}
+
+def xmlToEntryList(xml: String) = xml.split("</?entry>").filterNot(_.isEmpty).tail
+
+def report(entryXml: String): Option[String] = {
+  for { 
+    title <- child(entryXml, "title")
+    date <- child(entryXml, "updated").map(_.replaceAll("T.*",""))
+    author <- child(entryXml, "name")
+  }
+  yield s"title:  $title\ndate:   $date\nauthor: $author"
+}
+
+def getGithubCommitReports(urb: (String,String,String)): List[String] = {
+  val xml = githubRss(urb._1, urb._2, urb._3)
+  val entries = xmlToEntryList(xml).toList
+  val branchInfo = s"branch: ${urb._2}:${urb._3}\n"
+  entries flatMap (e => report(e).toList) map (branchInfo + _)
+}
+
+def getGithubReports(urbs: List[(String,String,String)]): String = {
+  val commits = List.newBuilder[String]
+  
+  import concurrent.ExecutionContext.Implicits.global
+  val futures = urbs map { urb =>
+    concurrent.Future { commits ++= getGithubCommitReports(urb) }
+  }
+  val future = concurrent.Future.sequence(futures)
+  
+  import concurrent.duration._
+  concurrent.Await.result(future, Duration(5, SECONDS))
+  
+  val separator = "\n" + "="*60 + "\n"
+  val title = s"Github activity for ${urbs map (_._1) mkString (", ")} repos"
+  
+  val sortedCommits = commits.result.sortBy { c =>
+    c.replaceAll("(?s).*date:   ","").replaceAll("(?s)\\s.*","")
+  }.reverse
+  
+  (title :: sortedCommits) mkString separator
+}
+
+
+// Entry point for our script
+val threefers: Array[Array[String]] = args map (_.split("/")) filter (_.size == 3)
+val urbs: List[(String,String,String)] = threefers.toList map (x => (x(0), x(1), x(2)))
+
+urbs match {
+  case Nil => 
+    println("Usage: GithubCommits <user>/<repo>/<branch>")
+  case l => 
+    println(s"Reporting for ${l.size} repositories: ${l.mkString(" & ")}")
+    println(getGithubReports(l))
+}
+-------------------------------------------------------------------------------
+
+
+Here's an example of reporting the commits for the scala, akka and scalaz projects. I've replaced the slash in the scalaz branch with a url encoded slash so it would work with my not-so-robust input parsing code.
+
+[source]
+-------------------------------------------------------------------------------
+> ./GithubCommits.scala scala/scala/2.11.x akka/akka/master scalaz/scalaz/series%2f7.2.x
+[info] Set current project to root-4b6293a0de6b4c2b38c4 (in build file:/Users/jason/.sbt/boot/4b6293a0de6b4c2b38c4/)
+Reporting for 3 repositories: (scala,scala,2.11.x) & (akka,akka,master) & (scalaz,scalaz,series%2f7.2.x)
+Github activity for scala, akka, scalaz repos
+============================================================
+branch: scalaz:series%2f7.2.x
+title:  Merge pull request #867 from gildegoma/new-travis-env
+date:   2014-12-25
+author: xuwei-k
+============================================================
+branch: scalaz:series%2f7.2.x
+title:  Switch to new Travis CI build environment
+date:   2014-12-24
+author: gildegoma
+============================================================
+branch: scala:2.11.x
+title:  Merge pull request #4139 from retronym/ticket/7965
+date:   2014-12-23
+author: adriaanm
+============================================================
+branch: akka:master
+title:  =act, ker, rem, doc #16330 deprecate akka.util.Crypt
+date:   2014-12-20
+author: skrauchenia
+============================================================
+branch: scalaz:series%2f7.2.x
+title:  Merge pull request #864 from ceedubs/invariant-functor-instances
+date:   2014-12-12
+author: larsrh
+============================================================
+branch: scalaz:series%2f7.2.x
+title:  Move InvariantFunctor[F] instances to F companion object
+date:   2014-12-09
+author: ceedubs
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
 
