@@ -1,0 +1,287 @@
+
+1) Let's cover how to write a unit test in Scala with the ScalaTest framework.  This exercise will consist of adding a test to the IDE, executing it, and verifying its successful outcome. If you're already familiar with executing tests in an IDE this should be a fairly simple exercise. To better understand the ScalaTest framework, I recommend that you take a break from this exercise and browse the official documentation at http://www.scalatest.org/[the ScalaTest web site].
+
+We'll start with the "HtmlUtils" object (see <<objects_section>>). Create a new Scala class by right-clicking on the "src/main/scala" directory in the IDE and selecting *New -> Scala Class*. Type the name, "HtmlUtils", and set the type to an object. Replace the skeleton object with the following source:
+
+-------------------------------------------------------------------------------
+object HtmlUtils {
+  def removeMarkup(input: String) = {
+    input
+      .replaceAll("""</?\w[^>]*>""","")
+      .replaceAll("<.*>","")
+  }
+}
+-------------------------------------------------------------------------------
+
+The new "HtmlUtils.scala" file should be located in "src/main/scala", the root directory for source code in our project. Now add a new "HtmlUtilsSpec" class under "src/test/scala", creating the directory if necessary. Both SBT and IntelliJ will look for tests in this directory, a counterpart to the main "src/main/scala" directory. Add the following source to the "HtmlUtilsSpec.scala" file.
+
+-------------------------------------------------------------------------------
+import org.scalatest._                                                      
+
+class HtmlUtilsSpec extends FlatSpec with ShouldMatchers {                  
+
+  "The Html Utils object" should "remove single elements" in {              
+    HtmlUtils.removeMarkup("<br/>") should equal("")                        
+  }
+
+  it should "remove paired elements" in {
+    HtmlUtils.removeMarkup("<b>Hi</b>") should equal("Hi")
+  }
+
+  it should "have no effect on empty strings" in {
+    val empty = true
+    HtmlUtils.removeMarkup("").isEmpty should be(empty)                     
+  }
+
+}
+-------------------------------------------------------------------------------
+
+We're only using the +FlatSpec+ and +ShouldMatchers+ types from this package, but will import everything so we can easily add additional test utilities in the future (such as "OptionValues", a favorite of mine). The class +FlatSpec+ is one of several different test types you can choose from, modeled after Ruby's *RSpec*. +ShouldMatchers+ adds the +should+ and +be+ operators to your test, creating a domain-specific language that can help make your tests more readable.
+
+The first test starts off a bit differently from the other tests. With the +FlatSpec+, the first test in a file should start with a textual description of what you are testing in this file. Later tests will use the +it+ keyword to refer to this description. This helps to create highly readable test reports.
+
+In the test body, the +equal+ operator ensures that the value preceding +should+ is equal to its argument, here the empty string +""+. If not equal, it will cause the test to fail and exit immediately. Likewise, the +be+ operator fails the test if the value before +should+ isn't the same instance, useful for comparing global instances like +true+, +Nil+, and +None+.
+
+Before running the test, open the IntelliJ *Plugins* preference panel under *Preferences* and ensure that the "jUnit" plugin is installed. The plugin will ensure that your test results will be easily viewable and browseable.
+
+Once you have added the test to your project, go ahead and compile it in the IDE. If it doesn't compile, or it otherwise complains about the lack of a "ScalaTest" package, make sure your build script has the ScalaTest dependency and that you can view it in the "External Libraries" section of the "Project" view in IntelliJ.
+
+Now we'll run it. Right click on the test class's name, "HtmlUtilsSpec", and choose *Run 'HtmlUtilsSpec'*. Executing the test will take no more than a few seconds, and if you entered the test and original application in correctly they will all be successful.  <<intellij_tests>> shows how the test results should appear when the test completes.
+
+[[intellij_tests]]
+.The Test Results View In IntelliJ IDEA 
+image::images/intellij_idea_tests.png["Test Results View"]
+
+Let's conclude this exercise with an actual exercise for you to implement: add additional tests to our "HtmlUtilsSpec" test class. Are there there any features areas that aren't yet tested? Are all valid HTML markup possibilities supported?
+
+There's also the question of whether Javascript contained within "script" tags should be stripped or appear along with the rest of the text. Consider this a bug in the original version of "HtmlUtils". Add a test to verify that the Javascript text will be tripped out and then run the test. When it fails, fix "HtmlUtils" and re-run the test to verify it has been fixed.
+
+Congratulations, you are now writing tests in Scala! Remember to keep writing tests as you work through the rest of the exercises in this book, using them to assert how your solutions should work and to catch any (unforseeable!) bugs in them.
+
+
+*Answer*
+
+
+A good use of tests is to test the challenging cases in addition to the "happy path" of simple test cases. I wasn't sure that the html utils function would be able to support html elements that cover more than a single line, but happily they were correctly stripped out.
+
+Here is the "HtmlUtils" object updated to strip out any Javascript code in `<script>` tags. The flag expression "(?s)" enables "DOTALL" mode which allows the regular expression to ignore line boundaries.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+object HtmlUtils {
+  def removeMarkup(input: String) = {
+    input
+      .replaceAll("(?s)<script.*</script>", "")
+      .replaceAll("""</?\w[^>]*>""","")
+      .replaceAll("<.*>","")
+  }
+}
+-------------------------------------------------------------------------------
+
+
+Here is its test class with two new tests, one to verify that multi-line elements are stripped and another to verify that Javascript code is filtered out.
+
+[source,scala]
+-------------------------------------------------------------------------------
+import org.scalatest._
+
+class HtmlUtilsSpec extends FlatSpec with ShouldMatchers {
+
+  "The Html Utils object" should "remove single elements" in {
+    HtmlUtils.removeMarkup("<br/>") should equal("")
+  }
+
+  it should "remove paired elements" in {
+    HtmlUtils.removeMarkup("<b>Hi</b>") should equal("Hi")
+  }
+
+  it should "have no effect on empty strings" in {
+    val empty = true
+    HtmlUtils.removeMarkup("").isEmpty should be(empty)
+  }
+
+  it should "support multiline tags" in {
+    val src = """
+<html
+>
+<body>
+Cheers
+<div
+class="header"></div
+>
+</head></html>
+    """
+
+    HtmlUtils.removeMarkup(src).trim should equal("Cheers")
+  }
+
+  it should "strip Javascript source" in {
+    val src = """
+<html>
+<head>
+<script type="text/javascript">
+  console.log("Yo");
+</script>
+</head></html>
+    """
+
+    HtmlUtils.removeMarkup(src) should not include "console.log"
+  }
+
+}
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+2) Let's work on a different example from this chapter. Create a new Scala trait titled "SafeStringUtils" and add the following source:
+
+-------------------------------------------------------------------------------
+trait SafeStringUtils {
+  // Returns a trimmed version of the string wrapped in an Option, 
+  // or None if the trimmed string is empty.
+  def trimToNone(s: String): Option[String] = {
+    Option(s) map(_.trim) filterNot(_.isEmpty)
+  }
+}
+-------------------------------------------------------------------------------
+
+Verify that the trait compiles in the IDE. If it all works, complete the following steps:
+
+a) Create an object version of the trait. 
+
+b) Create a test class, "SafeStringUtilsSpec", to test the "SafeStringUtils.trimToNone()" method. Verify that it trims strings and safely handles null and empty strings. You should have 3-5 separate tests in your test class. Run the test class and verify it completes successfully.
+
+c) Add a method that safely converts a string to an integer, without throwing an error if the string is unparseable. Write and execute tests for valid and invalid input. What are the most appropriate monadic collections to use in this function?
+
+d) Add a method that safely converts a string to a long, without throwing an error if the string is unparseable. Write and execute tests for valid and invalid input. What are the most appropriate monadic collections to use in this function?
+
+e) Add a method that returns a randomly generated string of the given size, limited to only upper- and lower-case letters. Write and execute tests that verify the correct contents are return and that invalid input is handled. Are there any appropriate monadic collections to use in this function?
+
+
+
+
+*Answer*
+
+
+
+
+
+
+
+
+
+3) Write a command line application that will search and replace text inside files. The input arguments are a search pattern, a regular expression, the replacement text, and one or more files to search. 
+
+a) Start by writing a skeleton command line application that parses the input arguments: the search pattern, the replacement text arguments, and the files to process as a list of strings. Print these out to verify you have captured them correctly.
+
+b) Execute this skeleton applicaton by running it from the command line with +sbt "run-main <object name> <input arguments>"+. The input arguments must be in the same double quotes as the "run-main" argument so that the SBT tool reads it all as a single command.  You can also run it from the IDE by selecting *Run -> Run...* and creating a runtime configuration. Runtime configurations allow you to specify the input arguments once, or else to show the entire configuration every time it is executed. Verify that your search pattern, replacement text and list of files is successfully parsed.
+
+c) Implement the core of the application by reading each input file, searching and replacing the specified pattern, and then printing the result out to the console. Try this with a few input files to verify your pattern gets replaced.
+
+d) Now write the modified text back to the file it was read from. Here is an example of using the Java library to write a string to a file.
+
+-------------------------------------------------------------------------------
+import java.io._
+val writer = new PrintWriter(new File("out.txt"))
+writer.write("Hello, World!\nHere I am!")
+writer.close()
+-------------------------------------------------------------------------------
+
+e) Make your application safer to use by having it create a backup of its input files before modifying them. You can create a backup by first writing the unmodified contents out to a file with the input's name plus ".bak". Use +new java.io.File(<file name>).exists()+ to ensure that the backup file's name does *not* exist before creating it. You can try incremental numbers such as ".bak2", ".bak3" to find unique backup file names.
+
+f) Create a test class and write tests to verify that your application will work as expected. The core functionality of your application should be invocable as methods without actually launching the application. Make sure the functionality is broken down into methods of a readable and manageable size, and then write individual tests for the core methods as well as the +main+ method. To end the exercise, run your tests and verify they all succeed, then run your application from the command line with a test file. 
+
+
+*Answer*
+
+
+4) Write an application that summarizes a file. It will take a single text file as input and print an overall summary including the number of characters, words and paragraphs as well as a list of the top 20 words by usage.
+
+The application should be smart enough to filter out non-words. Parsing a Scala file should reveal words, for example, and not special characters such as "{" or "//". It should also be able to count paragraphs that have real content versus empty space.
+
+Write tests that use your own multi-line strings to verify the output. Your application should be modularized into discrete methods for easier testing. You should be able to write a test that gives the string "this is is not a test" and receives an instance that will reveal the word "is" as the top used word.
+
+To really test out your knowledge of this chapter's contents, make sure to use objects, traits, and case classes in your solution.
+
+
+*Answer*
+
+
+
+5) Write an application that reports on the most recently closed issues in a given Github project. The input arguments should include the repository name, project name, and an optional number of issues to report with a default value of 10) The output will have a report header and display each issue's number, title, user name, number of comments, and label names. The output should be well-formatted, with fixed-width columns delimited with pipes (+|+) and a header delimited with equals signs (+=+).
+
+You'll need to in read in the issues from the Github API (see exercise 7 in <<exercises_collections_ch>> for information on reading a URL's contents), parse the JSON values, and then print a detailed format. Here is an example url for returning the 10 most recent closed issues from the official Scala project on Github.
+
+-------------------------------------------------------------------------------
+https://api.github.com/repos/scala/scala/issues?state=closed&per_page=10
+-------------------------------------------------------------------------------
+
+We'll use the *Json4s* library to parse the JSON response into a list of our own case classes. First, add this dependency to your build script and rebuild the project.
+
+-------------------------------------------------------------------------------
+"org.json4s" %% "json4s-native" % "3.2.10"
+-------------------------------------------------------------------------------
+
+This can go either before or after the Scalatest dependency. IntelliJ should pick up the change, download the library and rebuild your project. If it is not doing so, open the *SBT* view in IntelliJ and refresh the project, or run +sbt clean compile+ from the command line.
+
+The JSON response from the API above is rather large, but you don't need to parse all of the fields. You should design a case class that contains the exact fields you want to parse from the JSON, using the +Option+ type for nullable or optional fields. When you parse the JSON response, Json4s will insert only the fields you have defined in your case class and ignore the rest.
+
+Here is an example of using Json4s to parse the "labels" array from the larger Github issue document. If you study the output from the API for a single record, you should be able to design a series of case classes that will only contain the information you need. Note that the JSON document returned by the API is an array, so you will probably need to invoke the +extract+ method with a +List+ (e.g., +extract[List[GithubIssue]]+).
+
+-------------------------------------------------------------------------------
+import org.json4s.DefaultFormats                                          <1>
+import org.json4s.native.JsonMethods                                      <2>
+
+val jsonText = """
+{
+  "labels": [
+    {
+      "url": "https://api.github.com/repos/scala/scala/labels/tested",
+      "name": "tested",
+      "color": "d7e102"
+    }
+  ]
+}
+"""
+
+case class Label(url: String, name: String)                               <3>
+case class LabelDocument(labels: List[Label])                             <4>
+  
+implicit val formats = DefaultFormats                                     <5>
+val labelDoc = JsonMethods.parse(jsonText).extract[LabelDocument]         <6>
+
+val labels = labelDoc.labels
+val firstLabel = labels.headOption.map(_.name)
+-------------------------------------------------------------------------------
+
+<1> +DefaultFormats+ has support for common date formats as well as numbers and strings. 
+<2> We're using the "native" JSON parser in +JsonMethods+ to parse JSON documents and extract them into case class instances.
+<3> A "Label" is what I'm calling an item in the "labels" JSON array. Note that I didn't need to specify the "color" field.
+<4> The total JSON document has a single field, "labels", so we need a case class that represents the document.
+<5> The +implicit+ keyword is one we'll study in Chapter 10) I'm sorry to spring this on you before we have had a chance to cover it, but you'll need this line to ensure that Json4s can parse your JSON document.
+<6> +JsonMethods+ parses the JSON text to its own intermediate format, which can then be extracted with a given case class.
+
+
+*Answer*
+
+
+
+6) This exercise depends on the previous exercise being finished. Once you have the completed Github report application, let's work on refactoring it for better reusability and reliability.
+
+a) Start by writing tests for the Github report to verify the correct behavior of each component. How much of the logic in the application can you test if your computer lacked an internet connection? You should be able to test most of the logic without being able to actually connect to the Github site.
+
+b) Refactor the JSON handling code out to its own trait, eg "JsonSupport". Write tests to verify that it parses JSON code correctly, and handles exceptions that may be thrown by the Json4s library. Would it be useful to provide an object version of this trait?
+
+c) Do the same for the web handling code. Create your own "HtmlClient" trait and object that can take a url and return the content as a list of strings. Can you include the server's status response in a class along with the content? Make sure to write tests to verify the web handling code can prevent any exceptions from being thrown. 
+
+d) Finally, refactor your report generation code, the part that handles the clean fixed-width columns, into a reusable trait. Can it take a tuple of any size and print out its contents? Is there a more appropriate data type that it should take, one that supports variable numbers of columns but knows how to print out strings versus double values? Make sure your report generation code takes the maximum line width as an argument.
+
+
+*Answer*
+

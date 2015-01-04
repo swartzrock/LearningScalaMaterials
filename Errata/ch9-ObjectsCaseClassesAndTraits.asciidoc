@@ -1,0 +1,18 @@
+
+
+== Errata
+
+
+=== Chapter 9 - Objects, Case Classes & Traits
+
+==== Exercises
+
+1) "Add a test to verify that the Javascript text will be tripped out"
+
+> While still valid, this would more correctly be written as "will be stripped out"...
+
+
+
+
+
+
