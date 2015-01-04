@@ -1,0 +1,30 @@
+
+
+== Errata
+
+
+=== Chapter 8 - Classes
+
+==== Exercises
+
+2) c) Add the standard +head+, +tail+, +filter+, +size+ and +map+ collection methods for your linked list. Can you implement any of these using lazy values? Which of these should be implemented in the parent class from exercise 5 versus being implemented in its subclasses?
+
+> This should be "exercise b", not "exercise 5"
+
+
+4) channel.noteOn(50, 80); Thread.sleep(250); channel.noteOff(30)
+
+> One ought to be turning off the same notes they turned on, so the last call should read "channel.noteOff(50)".
+
+
+4) Assume we only ever need one instance, ever, with the volume set to 95)
+
+> That close-parenthesis should be a period.
+
+
+
+
+
+
+
+

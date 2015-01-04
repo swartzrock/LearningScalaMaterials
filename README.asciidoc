@@ -28,6 +28,8 @@ Answers to exercises in the first four chapters are now available. The answers f
 
 * https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/ch7-MoreCollections.asciidoc[Chapter 7 - More Collections] 
 
+* https://github.com/swartzrock/LearningScalaMaterials/blob/master/Exercises/ch8-Classes.asciidoc[Chapter 8 - Classes] 
+
 
 
 == Errata
