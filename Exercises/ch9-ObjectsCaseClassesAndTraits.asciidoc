@@ -164,9 +164,249 @@ d) Add a method that safely converts a string to a long, without throwing an err
 e) Add a method that returns a randomly generated string of the given size, limited to only upper- and lower-case letters. Write and execute tests that verify the correct contents are return and that invalid input is handled. Are there any appropriate monadic collections to use in this function?
 
 
-
-
 *Answer*
+
+
+a) Creating an object version of a trait is a popular way to extend the usefulness of that trait. 
+
+[source,scala]
+-------------------------------------------------------------------------------
+object SafeStringUtils extends SafeStringUtils
+-------------------------------------------------------------------------------
+
+
+b) A good test should indicate a specific feature, whether functional or non-functional. Here are additional tests that clearly indicate the desired behavior from the object.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+import org.scalatest._
+
+class SafeStringUtilsSpec extends FlatSpec with ShouldMatchers {
+
+  "The Safe String Utils object" should "trim empty strings to None" in {
+    SafeStringUtils.trimToNone("") should be(None)
+    SafeStringUtils.trimToNone(" ") should be(None)
+    SafeStringUtils.trimToNone("           ") should be(None) // tabs and spaces
+  }
+
+  it should "handle null values safely" in {
+    SafeStringUtils.trimToNone(null) should be(None)
+  }
+
+  it should "trim non-empty strings" in {
+    SafeStringUtils.trimToNone(" hi there ") should equal(Some("hi there"))
+  }
+
+  it should "leave untrimmable non-empty strings alone" in {
+    val testString = "Goin' down that road feeling bad ."
+    SafeStringUtils.trimToNone(testString) should equal(Some(testString))
+  }
+
+}
+-------------------------------------------------------------------------------
+
+
+c) The new "parseToInt" function first trims the input string, and then passes the value (if present) to a +toInt+ funciton that is wrapped in +Try+ and converted to +Option+. The +flatMap+ operation is used here as +toOption+ returns its own option, and we don't need two levels of options.
+
+Also, this is a good time to convert the "trimToNone" comment into a full scaladoc header, describing the input parameter and return value.
+
+[source,scala]
+-------------------------------------------------------------------------------
+import scala.util.Try
+
+trait SafeStringUtils {
+
+  /**
+   * Returns a trimmed version of the string wrapped in an Option,
+   * or None if the trimmed string is empty.
+   *
+   * @param s the string to trim
+   * @return Some with the trimmed string, or None if empty
+   */
+  def trimToNone(s: String): Option[String] = {
+    Option(s) map(_.trim) filterNot(_.isEmpty)
+  }
+
+  /**
+   * Returns the string as an integer or None if it could not be converted.
+   *
+   * @param s the string to be converted to an integer
+   * @return Some with the integer value or else None if not parseable
+   */
+  def parseToInt(s: String): Option[Int] = {
+    trimToNone(s) flatMap { x => Try(x.toInt).toOption }
+  }
+
+}
+
+object SafeStringUtils extends SafeStringUtils
+-------------------------------------------------------------------------------
+
+
+Here's the full test class including three new tests for the "parseToInt" function. 
+
+[source,scala]
+-------------------------------------------------------------------------------
+import org.scalatest._
+
+class SafeStringUtilsSpec extends FlatSpec with ShouldMatchers {
+
+  "The Safe String Utils object" should "trim empty strings to None" in {
+    SafeStringUtils.trimToNone("") should be(None)
+    SafeStringUtils.trimToNone(" ") should be(None)
+    SafeStringUtils.trimToNone("           ") should be(None) // tabs and spaces
+  }
+
+  it should "handle null values safely" in {
+    SafeStringUtils.trimToNone(null) should be(None)
+  }
+
+  it should "trim non-empty strings" in {
+    SafeStringUtils.trimToNone(" hi there ") should equal(Some("hi there"))
+  }
+
+  it should "leave untrimmable non-empty strings alone" in {
+    val testString = "Goin' down that road feeling bad ."
+    SafeStringUtils.trimToNone(testString) should equal(Some(testString))
+  }
+
+  it should "parse valid integers from strings" in {
+    SafeStringUtils.parseToInt("5") should be(Some(5))
+    SafeStringUtils.parseToInt("0") should be(Some(0))
+    SafeStringUtils.parseToInt("99467") should be(Some(99467))
+  }
+
+  it should "trim unnecessary white space before parsing" in {
+    SafeStringUtils.parseToInt("  5") should be(Some(5))
+    SafeStringUtils.parseToInt("0  ") should be(Some(0))
+    SafeStringUtils.parseToInt("  99467  ") should be(Some(99467))
+  }
+
+  it should "safely handle invalid integers" in {
+    SafeStringUtils.parseToInt("5 5") should be(None)
+    SafeStringUtils.parseToInt("") should be(None)
+    SafeStringUtils.parseToInt("abc") should be(None)
+    SafeStringUtils.parseToInt("1!") should be(None)
+  }
+
+}
+-------------------------------------------------------------------------------
+
+
+
+d) Here's the final version of SafeStringUtils with the new random string function.
+
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+import scala.util.{Random, Try}
+
+trait SafeStringUtils {
+
+  /**
+   * Returns a trimmed version of the string wrapped in an Option,
+   * or None if the trimmed string is empty.
+   *
+   * @param s the string to trim
+   * @return Some with the trimmed string, or None if empty
+   */
+  def trimToNone(s: String): Option[String] = {
+    Option(s) map(_.trim) filterNot(_.isEmpty)
+  }
+
+  /**
+   * Returns the string as an integer or None if it could not be converted.
+   *
+   * @param s the string to be converted to an integer
+   * @return Some with the integer value or else None if not parseable
+   */
+  def parseToInt(s: String): Option[Int] = {
+    trimToNone(s) flatMap { x => Try(x.toInt).toOption }
+  }
+
+  /**
+   * Returns a string composed of random lower- and upper-case letters
+   *
+   * @param size the size of the composed string
+   * @return the composed string
+   */
+  def randomLetters(size: Int): String = {
+    val validChars: Seq[Char] = ('A' to 'Z') ++ ('a' to 'z')
+    1 to size map { _ => Random nextInt validChars.size } map validChars mkString ""
+  }
+
+}
+
+object SafeStringUtils extends SafeStringUtils
+-------------------------------------------------------------------------------
+
+
+Following is the final version of the test class with three new tests.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+import org.scalatest._
+
+class SafeStringUtilsSpec extends FlatSpec with ShouldMatchers {
+
+  "The Safe String Utils object" should "trim empty strings to None" in {
+    SafeStringUtils.trimToNone("") should be(None)
+    SafeStringUtils.trimToNone(" ") should be(None)
+    SafeStringUtils.trimToNone("           ") should be(None) // tabs and spaces
+  }
+
+  it should "handle null values safely" in {
+    SafeStringUtils.trimToNone(null) should be(None)
+  }
+
+  it should "trim non-empty strings" in {
+    SafeStringUtils.trimToNone(" hi there ") should equal(Some("hi there"))
+  }
+
+  it should "leave untrimmable non-empty strings alone" in {
+    val testString = "Goin' down that road feeling bad ."
+    SafeStringUtils.trimToNone(testString) should equal(Some(testString))
+  }
+
+  it should "parse valid integers from strings" in {
+    SafeStringUtils.parseToInt("5") should be(Some(5))
+    SafeStringUtils.parseToInt("0") should be(Some(0))
+    SafeStringUtils.parseToInt("99467") should be(Some(99467))
+  }
+
+  it should "trim unnecessary white space before parsing" in {
+    SafeStringUtils.parseToInt("  5") should be(Some(5))
+    SafeStringUtils.parseToInt("0  ") should be(Some(0))
+    SafeStringUtils.parseToInt("  99467  ") should be(Some(99467))
+  }
+
+  it should "safely handle invalid integers" in {
+    SafeStringUtils.parseToInt("5 5") should be(None)
+    SafeStringUtils.parseToInt("") should be(None)
+    SafeStringUtils.parseToInt("abc") should be(None)
+    SafeStringUtils.parseToInt("1!") should be(None)
+  }
+
+  it should "generate random strings with only lower- and upper-case letters" in {
+    SafeStringUtils.randomLetters(200).replaceAll("[a-zA-Z]","") should equal("")
+  }
+
+  it should "be sufficiently random" in {
+    val src = SafeStringUtils.randomLetters(100).toList.sorted
+    val dest = SafeStringUtils.randomLetters(100).toList.sorted
+    src should not equal dest
+  }
+
+  it should "handle invalid input" in {
+    SafeStringUtils.randomLetters(-1) should equal("")
+  }
+
+
+}
+-------------------------------------------------------------------------------
 
 
 
@@ -200,6 +440,139 @@ f) Create a test class and write tests to verify that your application will work
 
 *Answer*
 
+Here's my solution for the application, which uses a set of short, single-purpose functions.
+
+[source,scala]
+-------------------------------------------------------------------------------
+
+import java.io.{PrintWriter, File}
+
+/**
+ * An application that can replace text inside existing files.
+ *
+ * Usage: MultiReplacer <search pattern> <replacement text> file1 [file2...]
+ */
+object MultiReplacer {
+
+  def replaceInFile(search: String, replace: String, file: File): Unit = {
+    val text = read(file)
+    createBackupFile(text, file)
+
+    val updated = text.replaceAll(search, replace)
+    write(updated, file)
+  }
+
+  def replaceInFileNames(search: String, replace: String, files: List[String]): Unit = {
+    val validFiles: List[File] = files map (new File(_)) filter (_.exists())
+
+    validFiles foreach { f =>
+      replaceInFile(search, replace, f)
+    }
+  }
+
+  def read(file: File) = io.Source.fromFile(file).getLines().mkString("\n")
+
+  def createBackupFile(s: String, file: File): Unit = {
+    val dir = new File(file.getAbsoluteFile.getParent)
+
+    var backupFile = new File(dir, s"${file.getName}.bak")
+    while (backupFile.exists()) {
+      backupFile = new File(dir, s"${file.getName}_${System.currentTimeMillis()}.bak")
+    }
+    write(s, backupFile)
+  }
+
+  def write(s: String, file: File): Unit = {
+    val writer = new PrintWriter(file)
+    writer.write(s)
+    writer.close()
+  }
+
+  def main(args: Array[String]) {
+    args.toList match {
+      case search :: replace :: files if files.nonEmpty =>
+        replaceInFileNames(search, replace, files)
+      case _ =>
+        println("Usage: MultiReplacer <search pattern> <replacement text> file1 [file2...]")
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+
+Here's my test class, including a utility method to write the content to a new unique file for testing.
+
+[source,scala]
+-------------------------------------------------------------------------------
+import java.io.File
+import org.scalatest._
+
+class MultiReplacerSpec extends FlatSpec with ShouldMatchers {
+
+  import MultiReplacer._
+
+  val content = "Twas brillig, and the slithy toves"
+
+  "The MultiReplacer app" should "replace basic patterns" in {
+    val testFile = newFile(content)
+
+    main(Array("brill[^,]*", "the night before xmas", testFile.getName))
+    read(testFile) should equal("Twas the night before xmas, and the slithy toves")
+
+    main(Array("the slithy.*", "all thru the house", testFile.getName))
+    read(testFile) should equal("Twas the night before xmas, and all thru the house")
+  }
+
+  it should "create a backup file before replacing text" in {
+    val testFile = newFile(content)
+
+    main(Array("brill[^,]*", "the night before xmas", testFile.getName))
+    read(testFile) should equal("Twas the night before xmas, and the slithy toves")
+
+    val backupFile = new File(testFile.getName + ".bak")
+    read(backupFile) should equal(content)
+  }
+  
+  it should "create a backup file of any file" in {
+    val testFile = newFile(content)
+    createBackupFile(content, testFile)
+    val backupFile = new File(testFile.getName + ".bak")
+    read(backupFile) should equal(read(testFile))
+  }
+
+  it should "replace content in a file" in {
+    val testFile = newFile(content)
+
+    replaceInFile("Twas brilli", "I was sleepin", testFile)
+    read(testFile) should equal("I was sleeping, and the slithy toves")
+  }
+
+  it should "replace content in a series of files by file name" in {
+    val testFile1 = newFile(content)
+    val testFile2 = newFile(content)
+
+    val files = List(testFile1.getName, testFile2.getName)
+    replaceInFileNames("Twas", "Twasn't", files)
+    read(testFile1) should equal("Twasn't brillig, and the slithy toves")
+    read(testFile2) should equal("Twasn't brillig, and the slithy toves")
+  }
+
+  private def newFile(content: String): File = {
+    val testFile = new File(s"testy_${SafeStringUtils.randomLetters(20)}.txt")
+    write(content, testFile)
+    testFile
+  }
+
+}
+
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
 4) Write an application that summarizes a file. It will take a single text file as input and print an overall summary including the number of characters, words and paragraphs as well as a list of the top 20 words by usage.
 
@@ -211,6 +584,16 @@ To really test out your knowledge of this chapter's contents, make sure to use o
 
 
 *Answer*
+
+
+
+
+
+
+
+
+
+
 
 
 
