@@ -585,10 +585,141 @@ To really test out your knowledge of this chapter's contents, make sure to use o
 
 *Answer*
 
+Answering this exercise requires some knowledge of regular expressions. For me, that means opening up the javadocs for the +java.util.regex.Pattern+ class and experimenting with solutions in the REPL.
+
+Here's my answer, and app that takes advantage of local traits to summarize a file into a case class in one step and then convert this into a printable summary in the next step.
 
 
+[source,scala]
+-------------------------------------------------------------------------------
+import java.io.File
 
 
+/**
+ * FileSummy is an app that prints a short summary of the content of one or more files
+ */
+object FileSummy extends FileStatsBuilder with FileStatsFormatting {
+
+  def summarize(file: File): Unit = {
+    val stats = buildFileStats(file)
+    val formatted = formatStats(stats)
+    println(formatted)
+  }
+
+  def main(args: Array[String]) {
+    val files = args map (new File(_)) filter (_.exists())
+    files foreach summarize
+  }
+
+}
+
+case class Stats(fileName: String, chars: Int, words: Int, paragraphs: Int, toppies: List[String])
+
+trait FileStatsBuilder {
+
+  def buildFileStats(file: File): Stats = {
+
+    def read(file: File) = io.Source.fromFile(file).getLines().mkString("\n")
+
+    val s: String = read(file).trim
+
+    val words = s.split("""\W+""")
+    val paragraphs = s.split("""\w+\W*\n\n""")
+
+    val toppies: List[String] = words
+      .map(_.toLowerCase)
+      .groupBy(w => w).toList
+      .sortBy(_._2.size).reverse
+      .map(_._1)
+      .take(20)
+
+    Stats(file.getName, s.size, words.size, paragraphs.size, toppies)
+  }
+
+}
+
+trait FileStatsFormatting {
+
+  def formatStats(stats: Stats): String = {
+    import stats._
+
+    val formatted = s"""File "$fileName" has $chars chars, $words words and $paragraphs paragraphs.
+The top 20 words were: ${toppies.mkString(", ")}."""
+
+    formatted
+      .replaceAll("\n", " ")
+      .replaceAll(", ([^,]*)$", ", and $1")
+  }
+
+}
+-------------------------------------------------------------------------------
+
+
+The test class for FileSummy tests the file summarization and statistics formatting, but not the actual printed version. Without some trickery about redirecting Java's +System.out+ there isn't a good way to capture its output. Fortunately the +println+ is only a single step, and the rest of the app uses functions that are easily testable.
+
+[source,scala]
+-------------------------------------------------------------------------------
+
+import java.io.{PrintWriter, File}
+import org.scalatest._
+
+
+class FileSummySpec extends FlatSpec with ShouldMatchers {
+
+  import FileSummy._
+
+  "The FileSummy app" should "correctly summarize a short file" in {
+    val file = newFile("this is is not a test")
+    val stats = buildFileStats(file)
+
+    stats.words should equal(6)
+    stats.toppies.head should equal("is")
+  }
+
+  it should "format the stats correctly" in {
+    val file = newFile("this is is not a test")
+    val stats = buildFileStats(file)
+    val formatted = formatStats(stats)
+
+    formatted should include ("21 chars")
+    formatted should include ("6 words")
+    formatted should include ("1 paragraphs")
+    formatted should include (file.getName)
+  }
+
+  it should "recognize paragraphs, ignoring non-word ones" in {
+    val contents = """
+
+
+The fire is slowly dying,
+And my dear, we're still good-by-ing.
+But, as long as you love me so,
+Let It Snow! Let It Snow! Let It snow
+
+{}
+
+Oh, it doesn't show signs of stopping,
+And I've brought some corn for popping,
+Since the lights are turned way down low,
+Let It Snow! Let It Snow! Let It Snow!
+    """
+
+    val file = newFile(contents)
+    val stats = buildFileStats(file)
+    stats.paragraphs should equal(2)
+  }
+
+
+  private def newFile(content: String): File = {
+    val testFile = new File(s"summytest_${SafeStringUtils.randomLetters(20)}.txt")
+    val writer = new PrintWriter(testFile)
+    writer.write(content)
+    writer.close()
+    testFile
+  }
+
+}
+-------------------------------------------------------------------------------
 
 
 
@@ -655,6 +786,16 @@ val firstLabel = labels.headOption.map(_.name)
 
 
 
+
+
+
+
+
+
+
+
+
+
 6) This exercise depends on the previous exercise being finished. Once you have the completed Github report application, let's work on refactoring it for better reusability and reliability.
 
 a) Start by writing tests for the Github report to verify the correct behavior of each component. How much of the logic in the application can you test if your computer lacked an internet connection? You should be able to test most of the logic without being able to actually connect to the Github site.
@@ -667,4 +808,15 @@ d) Finally, refactor your report generation code, the part that handles the clea
 
 
 *Answer*
+
+
+
+
+
+
+
+
+
+
+
 
