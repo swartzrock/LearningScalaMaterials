@@ -46,11 +46,8 @@ Before running the test, open the IntelliJ *Plugins* preference panel under *Pre
 
 Once you have added the test to your project, go ahead and compile it in the IDE. If it doesn't compile, or it otherwise complains about the lack of a "ScalaTest" package, make sure your build script has the ScalaTest dependency and that you can view it in the "External Libraries" section of the "Project" view in IntelliJ.
 
-Now we'll run it. Right click on the test class's name, "HtmlUtilsSpec", and choose *Run 'HtmlUtilsSpec'*. Executing the test will take no more than a few seconds, and if you entered the test and original application in correctly they will all be successful.  <<intellij_tests>> shows how the test results should appear when the test completes.
+Now we'll run it. Right click on the test class's name, "HtmlUtilsSpec", and choose *Run 'HtmlUtilsSpec'*. Executing the test will take no more than a few seconds, and if you entered the test and original application in correctly they will all be successful. 
 
-[[intellij_tests]]
-.The Test Results View In IntelliJ IDEA 
-image::images/intellij_idea_tests.png["Test Results View"]
 
 Let's conclude this exercise with an actual exercise for you to implement: add additional tests to our "HtmlUtilsSpec" test class. Are there there any features areas that aren't yet tested? Are all valid HTML markup possibilities supported?
 
