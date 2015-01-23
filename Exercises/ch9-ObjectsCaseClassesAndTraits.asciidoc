@@ -730,7 +730,7 @@ Let It Snow! Let It Snow! Let It Snow!
 
 5) Write an application that reports on the most recently closed issues in a given Github project. The input arguments should include the repository name, project name, and an optional number of issues to report with a default value of 10) The output will have a report header and display each issue's number, title, user name, number of comments, and label names. The output should be well-formatted, with fixed-width columns delimited with pipes (+|+) and a header delimited with equals signs (+=+).
 
-You'll need to in read in the issues from the Github API (see exercise 7 in <<exercises_collections_ch>> for information on reading a URL's contents), parse the JSON values, and then print a detailed format. Here is an example url for returning the 10 most recent closed issues from the official Scala project on Github.
+You'll need to in read in the issues from the Github API (see exercise 7 in the "Collections" chapter for information on reading a URL's contents), parse the JSON values, and then print a detailed format. Here is an example url for returning the 10 most recent closed issues from the official Scala project on Github.
 
 -------------------------------------------------------------------------------
 https://api.github.com/repos/scala/scala/issues?state=closed&per_page=10
@@ -785,13 +785,128 @@ val firstLabel = labels.headOption.map(_.name)
 *Answer*
 
 
+The json4s library can parse JSON documents into case class instances. To support parting the Github JSON document, I created a main class class plus additional case classes for the "user" and "labels" fields. 
+
+Here is my solution to this exercise.
 
 
+[source,scala]
+-------------------------------------------------------------------------------
+import org.json4s.DefaultFormats
+import org.json4s.native.JsonMethods
 
 
+case class GithubUser(login: String)
+
+case class GithubLabel(name: String)
+
+case class GithubIssue(number: Int, title: String, user: GithubUser, labels: List[GithubLabel], comments: Int)
+object GithubIssue {
+
+  implicit val formats = DefaultFormats
+
+  def parseIssuesFromJson(jsonText: String): List[GithubIssue] = {
+    JsonMethods.parse(jsonText).extract[List[GithubIssue]]
+  }
+
+}
 
 
+/**
+ * The Github Issue Reporter prints a report of recently closed issues in the given github repo.
+ */
+object GHIssueReporter {
 
+  /**
+   * Retrieves the latest closed Github issues and prints a report
+   */
+  def report(user: String, repo: String, count: Int = 10): Unit = {
+    println(s"Creating a report for $user / $repo on $count issues")
+
+    val content: String = githubClosedIssues(user, repo, count)
+    val issues: List[GithubIssue] = GithubIssue.parseIssuesFromJson(content)
+    val reportContent = buildReport(issues)
+    println(reportContent)
+  }
+
+  /**
+   * Returns a formatted report of the given issues with column names and a horizontal border
+   */
+  def buildReport(issues: List[GithubIssue]): String = {
+    val issueRows = issues map formatIssue
+    val maxLength = issueRows.maxBy(_.size).size
+    val border = "=" * maxLength
+
+    val rows = formattedHeader :: border :: issueRows
+    rows mkString ("\n", "\n", "\n")
+  }
+
+  /**
+   * Format a Github issue as a single row in the report
+   */
+  def formatIssue(i: GithubIssue): String = {
+    val labelNames = i.labels.map(_.name).mkString(",")
+    val fields: List[String] = List(i.number.toString, i.title, i.user.login, i.comments.toString, labelNames)
+    val columns = formatFixedWidthColumns(fields)
+
+    columns mkString ("|","|","|")
+  }
+
+  /**
+   * The report header
+   */
+  lazy val formattedHeader = {
+    val columns = formatFixedWidthColumns(List("Id", "Title", "User", "Comments", "Labels"))
+    columns mkString ("|","|","|")
+  }
+
+  /**
+   * Format the given strings into fixed-width columns for the issue report
+   * @param cols a list of the 5 output fields
+   * @return the output fields with fixed-width formatting
+   */
+  def formatFixedWidthColumns(cols: List[String]): List[String] = {
+    if (cols.size < 5) cols
+    else List(
+      f"${cols(0)}%-7.7s",
+      f"${cols(1)}%-70.70s",
+      f"${cols(2)}%-15.15s",
+      f"${cols(3)}%-9.9s",
+      f"${cols(4)}%-20.20s"
+    )
+  }
+
+  /**
+   * Return a JSON document of recently closed issues in the given github repo
+   */
+  def githubClosedIssues(user: String, repo: String, count: Int): String = {
+
+    val url = s"https://api.github.com/repos/$user/$repo/issues?state=closed&per_page=$count"
+
+    val lines = io.Source.fromURL(url).getLines().toList
+    val content = lines.map(_.trim).mkString("")
+    content
+  }
+
+
+  def main(args: Array[String]): Unit = {
+
+    // These regex patterns ensure the input is valid and parseable
+    val userRepoRegex = """(\w+)/(\w+)""".r
+    val numIssuesRegex = """(\d+)""".r
+
+    args.toList match {
+      case userRepoRegex(user, repo) :: numIssuesRegex(numIssues) :: Nil =>
+        report(user, repo, numIssues.toInt)
+      case userRepoRegex(user, repo) :: Nil =>
+        report(user, repo)
+      case _ =>
+        println("Usage: GHIssueReporter user/repo [number of issues]")
+    }
+  }
+
+}
+-------------------------------------------------------------------------------
 
 
 
@@ -810,11 +925,260 @@ d) Finally, refactor your report generation code, the part that handles the clea
 *Answer*
 
 
+a) Here's my test class, including the full JSON from a single Github issue. I used Java's +ByteArrayOutputStream+ and Scala's +Console+ to capture output from +println+ statements for verification.
+
+[source,scala]
+-------------------------------------------------------------------------------
+
+import java.io.ByteArrayOutputStream
+
+import org.scalatest._
+
+trait PrintlnTesting {
+
+  /**
+   * Captures and returns all stdout / println output.
+   * @param f a function with no input or return values
+   * @return the text printed to stdout while executing the function
+   */
+  def withPrintlnCapture(f: => Unit): String = {
+    val buffer = new ByteArrayOutputStream()
+    Console.withOut(buffer)(f)
+    buffer.toString
+  }
+}
+
+class GHIssueReporterSpec extends FlatSpec with ShouldMatchers with PrintlnTesting {
+
+  import ch9.GHIssueReporter._
+
+
+  "The GHIssueReporter app" should "catch invalid input" in {
+    val sp = " *"
+
+    withPrintlnCapture { main(Array("")) } should include("Usage: GHIssueReporter user/repo")
+    withPrintlnCapture { main(Array("hohoho")) } should include("Usage: GHIssueReporter user/repo")
+    withPrintlnCapture { main(Array("hi", "there")) } should include("Usage: GHIssueReporter user/repo")
+    withPrintlnCapture { main(Array("hi", "there", "everyone")) } should include("Usage: GHIssueReporter user/repo")
+    withPrintlnCapture { main(Array("hi/there", "everyone")) } should include("Usage: GHIssueReporter user/repo")
+  }
+
+  it should "parse the number of issues to report" in {
+    val output = withPrintlnCapture { main(Array("slick/slick","1")) }
+    output should not include "Usage: GHIssueReporter user/repo"
+    output should include ("Comments")
+    output should include ("Labels")
+  }
+
+  it should "build a report from a list of issues" in {
+    val issues = GithubIssue.parseIssuesFromJson(sampleJsonIssue)
+    val report = buildReport(issues)
+    report should include("|4239   |")
+    report should include("|Trivial refactoring of scala / actors                                 |")
+    report should include("|jxcoder        |")
+    report should include("|5        |")
+    report should include("|reviewed,tested     |")
+  }
+
+  it should "format a single issue into a line of text" in {
+    val issues = GithubIssue.parseIssuesFromJson(sampleJsonIssue)
+    val report = formatIssue(issues.head)
+    report should include("|4239   |")
+    report should include("|Trivial refactoring of scala / actors                                 |")
+    report should include("|jxcoder        |")
+    report should include("|5        |")
+    report should include("|reviewed,tested     |")
+  }
+
+  it should "read issues live from Github" in {
+    val json = githubClosedIssues("slick", "slick", 3)
+    json should not equal ""
+    json should include("milestone")
+    json should include("api.github.com")
+    json should include("created_at")
+    json should include("organizations_url")
+
+  }
+
+  "The GithubIssue object" should "parse a JSON string into a new instance" in {
+    val issues = GithubIssue.parseIssuesFromJson(sampleJsonIssue)
+    issues.size should equal(1)
+
+    val issue = issues.head
+    issue.number should equal(4239)
+    issue.title should include("Trivial refactoring of scala")
+    issue.user.login should equal("jxcoder")
+    issue.labels.map(_.name) should contain("reviewed")
+    issue.labels.map(_.name) should contain("tested")
+  }
 
 
 
+  val sampleJsonIssue = """[{"url": "https://api.github.com/repos/scala/scala/issues/4239","labels_url": "https://api.github.com/repos/scala/scala/issues/4239/labels{/name}","comments_url": "https://api.github.com/repos/scala/scala/issues/4239/comments","events_url": "https://api.github.com/repos/scala/scala/issues/4239/events","html_url": "https://github.com/scala/scala/pull/4239","id": 53791036,"number": 4239,"title": "Trivial refactoring of scala / actors","user": {"login": "jxcoder","id": 1075547,"avatar_url": "https://avatars.githubusercontent.com/u/1075547?v=3","gravatar_id": "","url": "https://api.github.com/users/jxcoder","html_url": "https://github.com/jxcoder","followers_url": "https://api.github.com/users/jxcoder/followers","following_url": "https://api.github.com/users/jxcoder/following{/other_user}","gists_url": "https://api.github.com/users/jxcoder/gists{/gist_id}","starred_url": "https://api.github.com/users/jxcoder/starred{/owner}{/repo}","subscriptions_url": "https://api.github.com/users/jxcoder/subscriptions","organizations_url": "https://api.github.com/users/jxcoder/orgs","repos_url": "https://api.github.com/users/jxcoder/repos","events_url": "https://api.github.com/users/jxcoder/events{/privacy}","received_events_url": "https://api.github.com/users/jxcoder/received_events","type": "User","site_admin": false},"labels": [{"url": "https://api.github.com/repos/scala/scala/labels/reviewed","name": "reviewed","color": "02e10c"},{"url": "https://api.github.com/repos/scala/scala/labels/tested","name": "tested","color": "d7e102"}],"state": "closed","locked": false,"assignee": null,"milestone": {"url": "https://api.github.com/repos/scala/scala/milestones/45","labels_url": "https://api.github.com/repos/scala/scala/milestones/45/labels","id": 899891,"number": 45,"title": "2.11.6","description": "Merge to 2.11.x.\r\n\r\nRelease by end of Q1 2015.","creator": {"login": "adriaanm","id": 91083,"avatar_url": "https://avatars.githubusercontent.com/u/91083?v=3","gravatar_id": "","url": "https://api.github.com/users/adriaanm","html_url": "https://github.com/adriaanm","followers_url": "https://api.github.com/users/adriaanm/followers","following_url": "https://api.github.com/users/adriaanm/following{/other_user}","gists_url": "https://api.github.com/users/adriaanm/gists{/gist_id}","starred_url": "https://api.github.com/users/adriaanm/starred{/owner}{/repo}","subscriptions_url": "https://api.github.com/users/adriaanm/subscriptions","organizations_url": "https://api.github.com/users/adriaanm/orgs","repos_url": "https://api.github.com/users/adriaanm/repos","events_url": "https://api.github.com/users/adriaanm/events{/privacy}","received_events_url": "https://api.github.com/users/adriaanm/received_events","type": "User","site_admin": false},"open_issues": 26,"closed_issues": 9,"state": "open","created_at": "2014-12-11T01:11:35Z","updated_at": "2015-01-10T14:22:22Z","due_on": "2016-03-25T07:00:00Z","closed_at": null},"comments": 5,"created_at": "2015-01-08T19:36:11Z","updated_at": "2015-01-09T02:09:25Z","closed_at": "2015-01-08T21:17:45Z","pull_request": {"url": "https://api.github.com/repos/scala/scala/pulls/4239","html_url": "https://github.com/scala/scala/pull/4239","diff_url": "https://github.com/scala/scala/pull/4239.diff","patch_url": "https://github.com/scala/scala/pull/4239.patch"},"body": "Updated versions from 2013 to 2015.\r\nRemoved empty lines at the end of file."}]"""
+}
+-------------------------------------------------------------------------------
 
 
+
+b) The JSON parsing in the "GithubIssue" object works with valid input, but falls apart when invalid data is used. As part of moving the JSON parsing to a separate trait, we should also make sure that invalid input will be safely handled. 
+
+Here's a "JSONSupport" trait that also contains the imports for json4s classes, as the rest of the code doesn't need them. JSON parsing works as before, except that if any errors occur while reading the JSON or extracting it to a list of "GithubIssue" items an empty list will be returned.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+trait JSONSupport {
+
+  import org.json4s.DefaultFormats
+  import org.json4s.native.JsonMethods
+
+  implicit val formats = DefaultFormats
+
+  def parseIssuesFromJson(json: String): List[GithubIssue] = {
+    val t = Try( JsonMethods.parse(json).extract[List[GithubIssue]] )
+    t getOrElse Nil
+  }
+
+}
+-------------------------------------------------------------------------------
+
+
+The "GithubIssue" object no longer has to concern itself with JSON handling and can simply extend this trait.
+
+[source,scala]
+-------------------------------------------------------------------------------
+object GithubIssue extends JSONSupport
+-------------------------------------------------------------------------------
+
+To verify that invalid JSON content is parsed into an empty list, I've added one test that uses a subsection of the expected JSON document and another that has completely invalid JSON content. Both tests originally failed, but now pass with the new trait.
+
+[source,scala]
+-------------------------------------------------------------------------------
+it should "return an empty list when the JSON input lacks required fields" in {
+  val json: String = 
+    """[{"url": "https://api.github.com/repos/scala/scala/issues/4239"}]"""
+  val issues = GithubIssue.parseIssuesFromJson(json)
+  issues.size should equal(0)
+}
+
+it should "return an empty list when the JSON input can't be parsed" in {
+  val issues = GithubIssue.parseIssuesFromJson("""Sorry, that wasn't found""")
+  issues.size should equal(0)
+}
+-------------------------------------------------------------------------------
+
+
+c) The +io.Source.fromURL()+ function doesn't make it possible to find out the actual HTTP response code in the event of a failure. Instead, in the case of an error it throws an exception. We can catch that exception and turn it into an approximate value, however. In my version i chose 200 for a successful result (ie, no exception was thrown) versus 400 for an exception. The response code 400 is reserved for "bad requests" in the HTTP protocol, which doesn't work for all situations here (eg, the internet is down) but often is used when there is no more accurate code available.
+
+A better solution would be to switch to an HTTP client function with access to the response, such as the standard Apache HttpComponents library (famous among Java developers) or the Scala-based Dispatch library. This would make it possible to capture the original error response code in addition to an error response body from the server.
+
+That said, here is my solution to the problem. First, an "HttpSupport" trait along with an "HttpResponse" case class.
+
+[source,scala]
+-------------------------------------------------------------------------------
+case class HttpResponse(lines: List[String], code: Int)
+
+trait HttpSupport {
+
+  def readUrlAsLines(url: String): HttpResponse = {
+    Try( io.Source.fromURL(url).getLines().toList ) match {
+      case Success(l) => HttpResponse(l, 200)
+      case Failure(ex) => HttpResponse(Nil, 400)
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+Here is an updated version of the "githubClosedIssues()" function that now checks for the presence of a success (code 200) or a failure (all other codes).
+
+[source,scala]
+-------------------------------------------------------------------------------
+  /**
+   * Return a JSON document of recently closed issues in the given github repo
+   */
+  def githubClosedIssues(user: String, repo: String, count: Int): String = {
+
+    val url = s"https://api.github.com/repos/$user/$repo/issues?state=closed&per_page=$count"
+    readUrlAsLines(url) match {
+      case HttpResponse(lines, code) if code == 200 => lines.map(_.trim).mkString("")
+      case HttpResponse(l, code) => {
+        println(s"Could not read content from '$url'")
+        ""
+      }
+    }
+  }
+-------------------------------------------------------------------------------
+
+Finally, here is a new test that verifies that "githubClosedIssues()" correctly handles bad requests. In this case I'm passing it a user name that includes slashes, which will change the actual url to one that doesn't point to a valid Github repository.
+
+
+[source,scala]
+-------------------------------------------------------------------------------
+  it should "print an error when the url can't be read" in {
+    val output = withPrintlnCapture {
+      val json = githubClosedIssues("frank/en/berry", "//", 1)
+      json should equal("")
+    }
+    output should include ("Could not read content")
+  }
+-------------------------------------------------------------------------------
+
+
+
+d) This final part of the exercise involves moving yet another part of the original functionality of your application into a reusable trait. Rewriting and refactoring code to make it more useful and usable is a common practice of all developers. Therefore, decoupling code from its single use and into a reusable trait is a good skill to learn.
+
+Here is the new trait I created to format the clean fixed-width columns. It uses a case class, "FixWidthCol", to couple each column's text with its requested output size. The code which specifies the column sizes is not reusable, and so remains in the original object.
+
+[source,scala]
+-------------------------------------------------------------------------------
+case class FixWidthCol(text: String, width: Int)
+
+trait FixedWidthReportSupport {
+
+  def format(cols: List[FixWidthCol], maxWidth: Int): String = {
+    val result = cols map format mkString ("|","|","|")
+    result take maxWidth
+  }
+
+  def format(col: FixWidthCol): String = {
+    val formatting = "%-" + col.width + "." + col.width + "s"
+    formatting.format(col.text)
+  }
+
+}
+-------------------------------------------------------------------------------
+
+Here is the updated method which uses the "FixWidthCol" case class and the "FixedWidthReportSupport.format()" function.
+
+[source,scala]
+-------------------------------------------------------------------------------
+  /**
+   * Format the given strings into fixed-width columns for the issue report
+   * @param cols a list of the 5 output fields
+   * @return the output fields with fixed-width formatting
+   */
+  def formatFixedWidthColumns(cols: List[String]): String = {
+    val maxRowWidth = 130
+
+    val fixedWidthColumns = cols zip List(7, 70, 15, 9, 20) map { case (a,b) => FixWidthCol(a,b) }
+    format(fixedWidthColumns, maxRowWidth)
+  }
+
+-------------------------------------------------------------------------------
+
+The given list of strings is zipped with a list of the column widths and then mapped into a list of "FixWidthCol". The core logic in this method involves assigning a fixed column width to each of the input columns, based on their order. The actual string formatting is now handled by the trait.
+
+To verify that the new line width restriction works, I've written a new test with a ridiculously long issue title. The test verifies that the formatted output of the over-titled issue is correctly cropped down to the maximum line width.
+
+[source,scala]
+-------------------------------------------------------------------------------
+  it should "not format Github issues to go over 130 chars wide" in {
+    val ish = GithubIssue(0, "HelloWorld" * 20, GithubUser("Fred"), Nil, 1)
+    val report = formatIssue(ish)
+    println(report)
+    report.size > 130 should not be true
+  }
+-------------------------------------------------------------------------------
 
 
 
