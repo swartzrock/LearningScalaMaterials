@@ -47,8 +47,8 @@ Using parentheses around the subtraction, which needs to occur before the multip
 scala> 22.5 * 9 / 5 + 32
 res0: Double = 72.5
 
-scala> (res0 - 32) * 5 / 9
-res1: Double = 22.5
+scala> (res0 / 2 - 32) * 5 / 9
+res1: Double = 2.361111111111111
 -------------------------------------------------------------------------------
 
 
