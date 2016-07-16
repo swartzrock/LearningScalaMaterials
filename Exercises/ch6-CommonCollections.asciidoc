@@ -106,7 +106,7 @@ Finally, let's solve this with an old-fashioned recursive function. Limited to a
 [source,scala]
 -------------------------------------------------------------------------------
 scala> def first[A](items: List[A], count: Int): List[A] = {
-     |   if (count > 0 && items.tail != Nil) items.head :: first(items.tail, count - 1)
+     |   if (count > 0) items.head :: first(items.tail, count - 1)
      |   else Nil
      | }
 first: [A](items: List[A], count: Int)List[A]
