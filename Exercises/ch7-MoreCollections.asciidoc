@@ -55,7 +55,7 @@ Here's a tail-recursive implementation, including the "tailrec" annotation so th
 [source,scala]
 -------------------------------------------------------------------------------
 scala> @annotation.tailrec
-     | def fibAdd(l: List[Int], count: Int): List[Int] = {
+     | def fibAdd2(l: List[Int], count: Int): List[Int] = {
      |   if (count < 1) l
      |   else {
      |     val k = l :+ l.takeRight(2).sum
@@ -759,7 +759,7 @@ Here's an example of reporting the commits for the scala, akka and scalaz projec
 
 [source]
 -------------------------------------------------------------------------------
-> ./GithubCommits.scala scala/scala/2.11.x akka/akka/master scalaz/scalaz/series%2f7.2.x
+> ./GithubCommits.scala scala/scala/2.12.x akka/akka/master scalaz/scalaz/series%2f7.2.x
 [info] Set current project to root-4b6293a0de6b4c2b38c4 (in build file:/Users/jason/.sbt/boot/4b6293a0de6b4c2b38c4/)
 Reporting for 3 repositories: (scala,scala,2.11.x) & (akka,akka,master) & (scalaz,scalaz,series%2f7.2.x)
 Github activity for scala, akka, scalaz repos
