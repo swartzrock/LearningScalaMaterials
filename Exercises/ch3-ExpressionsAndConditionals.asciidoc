@@ -30,7 +30,7 @@ First, here's the if..else block (specifically an if..else-if..else block).
 scala> val amount = 2.143
 amount: Double = 2.143
 
-scala> if (amount > 0) "greater" else if (amount < 0) "lesser" else "same"
+scala> if (amount > 0) "greater" else if (amount < 0) "less" else "same"
 res0: String = greater
 -------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ Second, the match expression that achieves the same purpose.
 -------------------------------------------------------------------------------
 scala> amount match {
      |   case x if x > 0 => "greater"
-     |   case x if x < 0 => "lesser"
+     |   case x if x < 0 => "less"
      |   case x => "same"
      | }
 res1: String = greater

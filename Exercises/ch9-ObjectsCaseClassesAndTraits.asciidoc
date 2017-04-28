@@ -18,7 +18,7 @@ The new "HtmlUtils.scala" file should be located in "src/main/scala", the root d
 -------------------------------------------------------------------------------
 import org.scalatest._                                                      
 
-class HtmlUtilsSpec extends FlatSpec with ShouldMatchers {                  
+class HtmlUtilsSpec extends FlatSpec with Matchers {                  
 
   "The Html Utils object" should "remove single elements" in {              
     HtmlUtils.removeMarkup("<br/>") should equal("")                        
@@ -36,7 +36,7 @@ class HtmlUtilsSpec extends FlatSpec with ShouldMatchers {
 }
 -------------------------------------------------------------------------------
 
-We're only using the +FlatSpec+ and +ShouldMatchers+ types from this package, but will import everything so we can easily add additional test utilities in the future (such as "OptionValues", a favorite of mine). The class +FlatSpec+ is one of several different test types you can choose from, modeled after Ruby's *RSpec*. +ShouldMatchers+ adds the +should+ and +be+ operators to your test, creating a domain-specific language that can help make your tests more readable.
+We're only using the +FlatSpec+ and +Matchers+ types from this package, but will import everything so we can easily add additional test utilities in the future (such as "OptionValues", a favorite of mine). The class +FlatSpec+ is one of several different test types you can choose from, modeled after Ruby's *RSpec*. +Matchers+ adds the +should+ and +be+ operators to your test, creating a domain-specific language that can help make your tests more readable.
 
 The first test starts off a bit differently from the other tests. With the +FlatSpec+, the first test in a file should start with a textual description of what you are testing in this file. Later tests will use the +it+ keyword to refer to this description. This helps to create highly readable test reports.
 
@@ -83,7 +83,7 @@ Here is its test class with two new tests, one to verify that multi-line element
 -------------------------------------------------------------------------------
 import org.scalatest._
 
-class HtmlUtilsSpec extends FlatSpec with ShouldMatchers {
+class HtmlUtilsSpec extends FlatSpec with Matchers {
 
   "The Html Utils object" should "remove single elements" in {
     HtmlUtils.removeMarkup("<br/>") should equal("")
@@ -179,7 +179,7 @@ b) A good test should indicate a specific feature, whether functional or non-fun
 -------------------------------------------------------------------------------
 import org.scalatest._
 
-class SafeStringUtilsSpec extends FlatSpec with ShouldMatchers {
+class SafeStringUtilsSpec extends FlatSpec with Matchers {
 
   "The Safe String Utils object" should "trim empty strings to None" in {
     SafeStringUtils.trimToNone("") should be(None)
@@ -247,7 +247,7 @@ Here's the full test class including three new tests for the "parseToInt" functi
 -------------------------------------------------------------------------------
 import org.scalatest._
 
-class SafeStringUtilsSpec extends FlatSpec with ShouldMatchers {
+class SafeStringUtilsSpec extends FlatSpec with Matchers {
 
   "The Safe String Utils object" should "trim empty strings to None" in {
     SafeStringUtils.trimToNone("") should be(None)
@@ -347,7 +347,7 @@ Following is the final version of the test class with three new tests.
 -------------------------------------------------------------------------------
 import org.scalatest._
 
-class SafeStringUtilsSpec extends FlatSpec with ShouldMatchers {
+class SafeStringUtilsSpec extends FlatSpec with Matchers {
 
   "The Safe String Utils object" should "trim empty strings to None" in {
     SafeStringUtils.trimToNone("") should be(None)
@@ -504,7 +504,7 @@ Here's my test class, including a utility method to write the content to a new u
 import java.io.File
 import org.scalatest._
 
-class MultiReplacerSpec extends FlatSpec with ShouldMatchers {
+class MultiReplacerSpec extends FlatSpec with Matchers {
 
   import MultiReplacer._
 
@@ -661,7 +661,7 @@ import java.io.{PrintWriter, File}
 import org.scalatest._
 
 
-class FileSummySpec extends FlatSpec with ShouldMatchers {
+class FileSummySpec extends FlatSpec with Matchers {
 
   import FileSummy._
 
@@ -945,7 +945,7 @@ trait PrintlnTesting {
   }
 }
 
-class GHIssueReporterSpec extends FlatSpec with ShouldMatchers with PrintlnTesting {
+class GHIssueReporterSpec extends FlatSpec with Matchers with PrintlnTesting {
 
   import ch9.GHIssueReporter._
 
@@ -1032,7 +1032,7 @@ trait JSONSupport {
   implicit val formats = DefaultFormats
 
   def parseIssuesFromJson(json: String): List[GithubIssue] = {
-    val t = Try( JsonMethods.parse(json).extract[List[GithubIssue]] )
+    val t = scala.util.Try( JsonMethods.parse(json).extract[List[GithubIssue]] )
     t getOrElse Nil
   }
 

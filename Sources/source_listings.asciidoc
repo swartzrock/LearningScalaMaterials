@@ -219,8 +219,9 @@ scala> val 50cent = "$0.50"                                                <2>
            ^
 
 scala> val a.b = 25                                                        <3>
-<console>:7: error: not found: value a
+<console>:12: error: value b is not a member of Double
        val a.b = 25
+           ^
 
 scala> val `a.b` = 4                                                       <4>
 a.b: Int = 4
@@ -811,7 +812,7 @@ Day 2:, Day 3:, Day 4:, Day 5:, Day 6:, Day 7:)
 
 [source, scala]
 --------------------------------------------------------------------------------
-scala> for (day <- res0) print(day + ", ")
+scala> for (day <- res10) print(day + ", ")
 Day 1:, Day 2:, Day 3:, Day 4:, Day 5:, Day 6:, Day 7:,
 --------------------------------------------------------------------------------
 
@@ -1389,13 +1390,13 @@ scala> double(5)
 res0: Int = 10
 
 scala> val myDouble: (Int) => Int = double                                <1>
-myDouble: Int => Int = <function1>
+myDouble: Int => Int = $$Lambda$1664/192389035@6d73c7e1)
 
 scala> myDouble(5)                                                        <2>
 res1: Int = 10
 
 scala> val myDoubleCopy = myDouble
-myDoubleCopy: Int => Int = <function1>
+myDoubleCopy: Int => Int = $$Lambda$1665/1881990320@72d44701
 
 scala> myDoubleCopy(5)                                                    <3>
 res2: Int = 10
@@ -1414,7 +1415,7 @@ scala> def double(x: Int): Int = x * 2
 double: (x: Int)Int
 
 scala> val myDouble = double _
-myDouble: Int => Int = <function1>
+myDouble: Int => Int = $$Lambda$1666/17524610@5e9dc66
 
 scala> val amount = myDouble(20)
 amount: Int = 40
@@ -1427,7 +1428,7 @@ scala> def max(a: Int, b: Int) = if (a > b) a else b
 max: (a: Int, b: Int)Int
 
 scala> val maximize: (Int, Int) => Int = max
-maximize: (Int, Int) => Int = <function2>
+maximize: (Int, Int) => Int = $$Lambda$1667/994103853@47f389ca
 
 scala> maximize(50, 30)
 res3: Int = 50
@@ -1440,7 +1441,10 @@ scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50
 logStart: ()String
 
 scala> val start: () => String = logStart
-start: () => String = <function0>
+<console>:12: warning: Eta-expansion of zero-argument method values is deprecated. Did you intend to write logStart()?
+   val start: () => String = logStart
+                       ^
+start: () => String = $$Lambda$1672/2139800358@7f2789a0
 
 scala> println( start() )
 ===================================================
@@ -1474,7 +1478,7 @@ res5: String = ydaeR
 [source, scala]
 --------------------------------------------------------------------------------
 scala> val doubler = (x: Int) => x * 2
-doubler: Int => Int = <function1>
+doubler: Int => Int = $$Lambda$1677/759776058@7e69228d
 
 scala> val doubled = doubler(22)
 doubled: Int = 44
@@ -1490,7 +1494,7 @@ doubled: Int = 44
 [source, scala]
 --------------------------------------------------------------------------------
 scala> val greeter = (name: String) => s"Hello, $name"
-greeter: String => String = <function1>
+greeter: String => String = $$Lambda$1678/105198636@5d8a6614
 
 scala> val hi = greeter("World")
 hi: String = Hello, World
@@ -1503,7 +1507,7 @@ scala> def max(a: Int, b: Int) = if (a > b) a else b                        <1>
 max: (a: Int, b: Int)Int
 
 scala> val maximize: (Int, Int) => Int = max                                <2>
-maximize: (Int, Int) => Int = <function2>
+maximize: (Int, Int) => Int = $$Lambda$1679/1198603051@45eeed13
 
 scala> val maximize = (a: Int, b: Int) => if (a > b) a else b               <3>
 maximize: (Int, Int) => Int = <function2>
@@ -1518,8 +1522,8 @@ res6: Int = 96
 scala> def logStart() = "=" * 50 + "\nStarting NOW\n" + "=" * 50           
 logStart: ()String
 
-scala> val start = () => "=" * 50 + "\nStarting NOW\n" + "=" * 50          
-start: () => String = <function0>
+scala> val start = () => "=" * 50 + "\nStarting NOW\n" + "=" * 50
+start: () => String = $$Lambda$1680/567484288@2d133184
 
 scala> println( start() )
 ===================================================
@@ -1558,7 +1562,7 @@ res10: String = ydaeR
 [source, scala]
 --------------------------------------------------------------------------------
 scala> val doubler: Int => Int = _ * 2
-doubler: Int => Int = <function1>
+doubler: Int => Int = $$Lambda$1685/587633122@4bf5b38c
 --------------------------------------------------------------------------------
 
 
@@ -1625,7 +1629,7 @@ factorOf: (x: Int, y: Int)Boolean
 [source, scala]
 --------------------------------------------------------------------------------
 scala> val f = factorOf _
-f: (Int, Int) => Boolean = <function2>
+f: (Int, Int) => Boolean = $$Lambda$1693/121302989@35c26176
 
 scala> val x = f(7, 20)
 x: Boolean = false
@@ -1635,7 +1639,7 @@ x: Boolean = false
 [source, scala]
 --------------------------------------------------------------------------------
 scala> val multipleOf3 = factorOf(3, _: Int)
-multipleOf3: Int => Boolean = <function1>
+multipleOf3: Int => Boolean = $$Lambda$1694/1637373249@64329dff
 
 scala> val y = multipleOf3(78)
 y: Boolean = true
@@ -1648,7 +1652,7 @@ scala> def factorOf(x: Int)(y: Int) = y % x == 0
 factorOf: (x: Int)(y: Int)Boolean
 
 scala> val isEven = factorOf(2) _
-isEven: Int => Boolean = <function1>
+isEven: Int => Boolean = $$Lambda$1696/13957486@c412800
 
 scala> val z = isEven(32)
 z: Boolean = true
@@ -1695,7 +1699,7 @@ scala> val statusHandler: Int => String = {
      |   case 400 => "Your Error"
      |   case 500 => "Our error"
      | }
-statusHandler: Int => String = <function1>
+statusHandler: Int => String = $$Lambda$1711/78348276@3008a367"
 --------------------------------------------------------------------------------
 
 
@@ -1713,9 +1717,9 @@ res21: String = Your Error
 --------------------------------------------------------------------------------
 scala> statusHandler(401)
 scala.MatchError: 401 (of class java.lang.Integer)
-  at $anonfun$1.apply(<console>:7)
-  at $anonfun$1.apply(<console>:7)
-  ... 32 elided
+at .$anonfun$statusHandler$1(<console>:11)
+at .$anonfun$statusHandler$1$adapted(<console>:11)
+... 29 elided
 --------------------------------------------------------------------------------
 
 
@@ -2288,7 +2292,7 @@ nums: scala.collection.mutable.Buffer[Int] = ArrayBuffer(1)
 scala> for (i <- 2 to 10) nums += i
 
 scala> println(nums)
-Buffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+ArrayBuffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 --------------------------------------------------------------------------------
 
 
@@ -2300,7 +2304,7 @@ nums: scala.collection.mutable.Buffer[Int] = ArrayBuffer()
 scala> for (i <- 1 to 10) nums += i
 
 scala> println(nums)
-Buffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+ArrayBuffer(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 --------------------------------------------------------------------------------
 
 
@@ -2653,20 +2657,18 @@ x: Option[Int] = Some(123)
 scala> import concurrent.ExecutionContext.Implicits.global
 import concurrent.ExecutionContext.Implicits.global
 
-scala> val f = concurrent.Future { println("hi") }
+scala> val f = concurrent.Future { println(""hi"") }
 hi
-f: scala.concurrent.Future[Unit] = 
-  scala.concurrent.impl.Promise$DefaultPromise@29852487
+f: scala.concurrent.Future[Unit] = Future(<not completed>)
 --------------------------------------------------------------------------------
 
 
 [source, scala]
 --------------------------------------------------------------------------------
-scala> val f = concurrent.Future { Thread.sleep(5000); println("hi") }
-f: scala.concurrent.Future[Unit] = 
-  scala.concurrent.impl.Promise$DefaultPromise@4aa3d36
+scala> val f = concurrent.Future { Thread.sleep(5000); println(""hi"") }
+f: scala.concurrent.Future[Unit] = Future(<not completed>)
 
-scala> println("waiting")
+scala> println(""waiting"")
 waiting
 
 scala> hi
@@ -2708,11 +2710,10 @@ scala> def cityTemp(name: String): Double = {
      | }
 cityTemp: (name: String)Double
 
-scala> val cityTemps = Future sequence Seq(                        <5>
-     |   Future(cityTemp("Fresno")), Future(cityTemp("Tempe"))
-     | )
-cityTemps: scala.concurrent.Future[Seq[Double]] = 
- scala.concurrent.impl.Promise$DefaultPromise@51e0301d
+scala> val cityTemps = Future sequence Seq( 
+     |    Future(cityTemp("Fresno")), Future(cityTemp("Tempe"))
+     |  )
+cityTemps: scala.concurrent.Future[Seq[Double]] = List()
 
 scala> cityTemps onSuccess {
      |   case Seq(x,y) if x > y => println(s"Fresno is warmer: $x K") <6>
@@ -3394,7 +3395,7 @@ url: String = http://localhost
 
 [source, scala]
 --------------------------------------------------------------------------------
-scala> class User { protected val passwd = util.Random.nextString(10) }
+scala> class User { protected val passwd = scala.util.Random.nextString(10) }
 defined class User
 
 scala> class ValidUser extends User { def isValid = ! passwd.isEmpty }
@@ -3950,33 +3951,26 @@ import sbt.Keys._
 object HardyHeronBuild extends Build                                        <2>
 {
   val hardyHeronDependencies = List(
-    "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"                   <3>
+    "org.scalatest" % "scalatest_2.12"" % ""3.0.1"" % ""test""              <3>
   )
 
   val hardyHeronSettings = List(                                            <4>
     name := "HardyHeron",
     version := "1.0",
-    scalaVersion := "2.11.2",
+    scalaVersion := "2.12.1",
     libraryDependencies := hardyHeronDependencies
   )
 
   override lazy val settings = super.settings ++ hardyHeronSettings         <5>
 }
-
-[HardyHeron] > 
-
 [HardyHeron] > sbt compile
 [info] Loading project definition from ~/HardyHeron/project
-[info] Compiling 1 Scala source to ~/HardyHeron/project/target/scala-2.10/
-  sbt-0.13/classes...
+[info] Compiling 1 Scala source to ~/HardyHeron/project/target/scala-2.10/sbt-0.13/classes...
 [info] Set current project to hardyheron (in build file:~/HardyHeron/)
 [info] Updating {file:~/HardyHeron/}hardyheron...
-[info] Resolving jline#jline;2.12 ...
-[info] downloading http://repo1.maven.org/maven2/org/scalatest/             <6>
-  scalatest_2.11/2.2.1/scalatest_2.11-2.2.1.jar ...
-[info]  [SUCCESSFUL ] org.scalatest#scalatest_2.11;2.2.1!scalatest_2.11.jar
-  (bundle) (5232ms)
+[info] Resolving jline#jline;2.14.1 ...
 [info] Done updating.
+[info] Compiling 1 Scala source to ~/HardyHeron/target/scala-2.12/classes...
 [success] Total time: 7 s, completed June 7, 2014 12:49:44 AM
 
 [HardyHeron] > sbt "run Hello"                                              <7>
@@ -4008,7 +4002,7 @@ object HtmlUtils {
 --------------------------------------------------------------------------------
 import org.scalatest._                                                      
 
-class HtmlUtilsSpec extends FlatSpec with ShouldMatchers {                  
+class HtmlUtilsSpec extends FlatSpec with Matchers {                  
 
   "The Html Utils object" should "remove single elements" in {              
     HtmlUtils.removeMarkup("<br/>") should equal("")                        
@@ -4099,7 +4093,7 @@ scala> val t2: (Int, Char) = Tuple2[Int, Char](1, 'a')
 t2: (Int, Char) = (1,a)
 
 scala> val f1: Int=>Int = _ + 2
-f1: Int => Int = <function1>
+f1: Int => Int = $$Lambda$1049/1674390738@557a84fe
 
 scala> val f2: Int=>Int = new Function1[Int, Int] { def apply(x: Int) = x * 2 }
 f2: Int => Int = <function1>
@@ -4170,7 +4164,7 @@ Does the arity = 2? true
 [source, scala]
 --------------------------------------------------------------------------------
 scala> val hello1 = (n: String) => s"Hello, $n"
-hello1: String => String = <function1>
+hello1: String => String = $$Lambda$1181/1928075000@279e1422
 
 scala> val h1 = hello1("Function Literals")
 h1: String = Hello, Function Literals
@@ -4184,17 +4178,17 @@ scala> val h2 = hello2("Function1 Instances")
 h2: String = Hello, Function1 Instances
 
 scala> println(s"hello1 = $hello1, hello2 = $hello2")
-hello1 = <function1>, hello2 = <function1>
+hello1 = $line16.$read$$iw$$iw$$$Lambda$1181/1928075000@279e1422, hello2 = <function1>
 --------------------------------------------------------------------------------
 
 
 [source, scala]
 --------------------------------------------------------------------------------
 scala> val doubler = (i: Int) => i*2
-doubler: Int => Int = <function1>
+doubler: Int => Int = $$Lambda$1192/696759961@2d36add1
 
 scala> val plus3 = (i: Int) => i+3
-plus3: Int => Int = <function1>
+plus3: Int => Int = $$Lambda$1193/1902437002@1b881f1f
 
 scala> val prepend = (doubler compose plus3)(1)
 prepend: Int = 8

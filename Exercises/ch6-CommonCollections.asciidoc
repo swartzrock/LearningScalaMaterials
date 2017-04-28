@@ -128,7 +128,7 @@ Again, let's start with a short and simple implementation that takes advantage o
 
 [source,scala]
 -------------------------------------------------------------------------------
-scala> def longest(l: List[String]): String = names.sortBy(0 - _.size).head
+scala> def longest(l: List[String]): String = l.sortBy(0 - _.size).head
 longest: (l: List[String])String
 
 scala> val names = List("Harry", "Hermione", "Ron", "Snape")
