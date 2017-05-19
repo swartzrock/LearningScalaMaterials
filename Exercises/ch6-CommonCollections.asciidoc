@@ -9,14 +9,14 @@ There's many ways to generate this list with the collections library, too many t
 
 [source,scala]
 -------------------------------------------------------------------------------
-scala> for (i <- 0L to 9L; j = i * 2 + 1) yield j
+scala> for (i <- 0L to 19L; j = i * 2 + 1) yield j
 res0: scala.collection.immutable.IndexedSeq[Long] = Vector(1, 3, 5, 7, 9, 
 11, 13, 15, 17, 19)
 
-scala> 0L to 20L filter (_ % 2 == 1)
+scala> 0L to 40L filter (_ % 2 == 1)
 res1: scala.collection.immutable.IndexedSeq[Long] = Vector(1, 3, 5, 7, 9, 11, 13, 15, 17, 19)
 
-scala> 0L to 9L map (_ * 2 + 1)
+scala> 0L to 19L map (_ * 2 + 1)
 res2: scala.collection.immutable.IndexedSeq[Long] = Vector(1, 3, 5, 7, 9, 11, 13, 15, 17, 19)
 -------------------------------------------------------------------------------
 
