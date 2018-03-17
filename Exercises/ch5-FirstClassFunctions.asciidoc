@@ -78,7 +78,7 @@ res3: Int = -1002398428
 scala> val t = (nextInt, nextInt, nextInt)
 t: (Int, Int, Int) = (913142586,1268532435,94040930)
 
-scala> pickOne(t, (x, y) => x)
+scala> pickOne(t, (x, y) => y)
 res4: Int = 913142586
 -------------------------------------------------------------------------------
 
@@ -139,6 +139,7 @@ Here's an example of invoking the original function with a specific type and sep
 
 [source,scala]
 -------------------------------------------------------------------------------
+scala> def fzero[A](x: A)(f: A ⇒ Unit): A = { f(x); x }
 scala> fzero[Boolean](false) { b => println(s"b was $b") }
 b was false
 res1: Boolean = false
@@ -175,7 +176,7 @@ Indeed, using a wildcard to assign a function would help make "sq" into a functi
 scala> val sq = square _
 sq: Double => Double = <function1>
 
-scala> sq1(4.0)
+scala> sq(4.0)
 res0: Double = 16.0
 
 scala> val sq: Double => Double = square
